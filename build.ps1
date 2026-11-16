@@ -28,15 +28,20 @@ $vcRoots = @(
     'C:\Program Files\Microsoft Visual Studio\2022\Preview',
     'C:\Program Files\Microsoft Visual Studio\18\BuildTools',
     'C:\Program Files\Microsoft Visual Studio\18\Community',
-    'C:\Program Files\Microsoft Visual Studio\18\Enterprise'
+    'C:\Program Files\Microsoft Visual Studio\18\Enterprise',
+    'C:\Program Files\Microsoft Visual Studio\2026\BuildTools',
+    'C:\Program Files\Microsoft Visual Studio\2026\Community',
+    'C:\Program Files\Microsoft Visual Studio\2026\Professional',
+    'C:\Program Files\Microsoft Visual Studio\2026\Enterprise'
 )
+$clOnPath = Get-Command cl.exe -ErrorAction SilentlyContinue
 $vcvars = $vcRoots |
     ForEach-Object { Join-Path $_ 'VC\Auxiliary\Build\vcvars64.bat' } |
     Where-Object { Test-Path -LiteralPath $_ } |
     Select-Object -First 1
 
 # vswhere can find an install in a non-default location
-if (-not $vcvars) {
+if (-not $vcvars -and -not $clOnPath) {
     $vswhere = 'C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe'
     if (Test-Path -LiteralPath $vswhere) {
         $path = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
@@ -47,13 +52,14 @@ if (-not $vcvars) {
     }
 }
 
-if (-not $vcvars) {
-    Bad 'vcvars64.bat not found.'
-    Bad 'install "Visual Studio Build Tools 2022" with the Desktop C++ workload:'
+if (-not $vcvars -and -not $clOnPath) {
+    Bad 'no C++ toolchain: cl.exe is not on PATH and vcvars64.bat was not found.'
+    Bad 'install "Visual Studio Build Tools" with the Desktop C++ workload:'
     Bad '  winget install Microsoft.VisualStudio.2022.BuildTools'
     exit 1
 }
-Step "toolchain: $vcvars"
+if ($clOnPath) { Step "toolchain: cl.exe on PATH ($($clOnPath.Source))" }
+else         { Step "toolchain: $vcvars" }
 
 # --- 1. payload -------------------------------------------------------------
 if (-not $NoPayload) {

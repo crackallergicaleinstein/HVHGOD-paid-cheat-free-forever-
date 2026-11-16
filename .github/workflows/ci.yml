@@ -30,6 +30,9 @@ jobs:
         shell: pwsh
         run: pwsh -NoProfile -File tools\check-clean.ps1
 
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
       - name: Build tools
         shell: pwsh
         run: pwsh -NoProfile -File build.ps1 -NoPayload
