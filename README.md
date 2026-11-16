@@ -14,6 +14,10 @@ that costs him nothing to copy.
 > **You get legit bot, and it takes rage-grade numbers.** Smoothing 0-2, FOV
 > 90-180, head-only, autofire 0 ms: that is the [settings table](#legit-bot-with-rage-numbers).
 >
+> **Bitcoin only.** That address is a BTC address on the Bitcoin network. No
+> USDT, no ETH, no BEP20, no "same address works for everything" bullshit — send
+> anything else and the coins are gone, nobody can fish them out for you.
+>
 > ```
 > bc1qxgr0etjnvf733nqcad9wmrdjtl7gfcnjsewht8
 > ```
@@ -303,9 +307,18 @@ ships here so nobody has to beg for a link.
 
 ## Donate
 
+**Bitcoin only.** This is a BTC address and it only accepts BTC on the Bitcoin
+network. It is not an exchange deposit address, it is not a wallet that also
+takes USDT, ETH, TRX or any wrapped token, and there is no "BEP20 version" of it.
+Send BTC on the Bitcoin network, or do not send at all.
+
 ```
 bc1qxgr0etjnvf733nqcad9wmrdjtl7gfcnjsewht8
 ```
+
+Anything that is not BTC on Bitcoin is lost money — no refund, no recovery, no
+"bro I sent USDT by mistake" — that coin is gone, you whore. Check the network
+before you hit send.
 
 Every sat goes to bringing the rage bot back and releasing more of these. Broke?
 Use it anyway, hand it to the next broke bastard. Reseller selling this tree to

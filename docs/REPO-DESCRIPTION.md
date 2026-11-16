@@ -42,7 +42,8 @@ What you don't get:
 
 It is free forever. No trial, no key, no telegram admin, no "dm me". Compile it,
 play it, leak it further. If it saved you money, there is a Bitcoin address in the
-README to fund the next crack. If you're broke, use it anyway and give it to the
+README to fund the next crack — BTC on the Bitcoin network only, that address
+takes nothing else. If you're broke, use it anyway and give it to the
 next broke bastard.
 
 It is a cheat. It injects into cs2.exe. VAC bans are permanent and hardware-linked.
