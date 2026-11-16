@@ -21,6 +21,7 @@ that costs him nothing to copy.
 ## Contents
 
 - [What you get](#what-you-get)
+- [Screenshots](#screenshots)
 - [Requirements](#requirements)
 - [Install and start](#install-and-start)
 - [Using it](#using-it)
@@ -52,6 +53,27 @@ that costs him nothing to copy.
 It is the vendor's binary with six booleans forced true. It is not a cheat
 written here, and the decompiled tree is not the original source — that does not
 exist anywhere, stop asking.
+
+## Screenshots
+
+The launcher — chips, status, SUMMON / BANISH:
+
+![launcher](docs/launcher.png)
+
+The loading card that sits over the game while the pipeline does real work
+(preflight → staging → launch → map → imports → attach → scrub → verify). Those
+numbers read `work\progress.txt`; nothing on it is a fake animation:
+
+![loading](docs/loading.png)
+
+The menu in game — legitbot, triggerbot, auto wall. The rage side is off in this
+build, the legit side is where the filth happens:
+
+![legitbot](docs/screenshots/menu-legitbot.png)
+
+Profile panel, radar, watermark, clan tag, accent colour, day theme:
+
+![profile](docs/screenshots/menu-profile.png)
 
 ## Requirements
 
