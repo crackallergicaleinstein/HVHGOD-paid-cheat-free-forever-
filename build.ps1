@@ -17,12 +17,35 @@ function Ok($m)   { Write-Host "[build] $m" -ForegroundColor Green }
 function Bad($m)  { Write-Host "[build] $m" -ForegroundColor Red }
 
 # --- toolchain --------------------------------------------------------------
-$vcvars = @(
-    'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat',
-    'C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat',
-    'C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Auxiliary\Build\vcvars64.bat',
-    'C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvars64.bat'
-) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+# BuildTools, Community, Professional and Enterprise all ship the same helper.
+# GitHub's windows-latest image has Enterprise, a dev box usually has BuildTools.
+$vcRoots = @(
+    'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools',
+    'C:\Program Files\Microsoft Visual Studio\2022\BuildTools',
+    'C:\Program Files\Microsoft Visual Studio\2022\Community',
+    'C:\Program Files\Microsoft Visual Studio\2022\Professional',
+    'C:\Program Files\Microsoft Visual Studio\2022\Enterprise',
+    'C:\Program Files\Microsoft Visual Studio\2022\Preview',
+    'C:\Program Files\Microsoft Visual Studio\18\BuildTools',
+    'C:\Program Files\Microsoft Visual Studio\18\Community',
+    'C:\Program Files\Microsoft Visual Studio\18\Enterprise'
+)
+$vcvars = $vcRoots |
+    ForEach-Object { Join-Path $_ 'VC\Auxiliary\Build\vcvars64.bat' } |
+    Where-Object { Test-Path -LiteralPath $_ } |
+    Select-Object -First 1
+
+# vswhere can find an install in a non-default location
+if (-not $vcvars) {
+    $vswhere = 'C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe'
+    if (Test-Path -LiteralPath $vswhere) {
+        $path = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+        if ($path) {
+            $candidate = Join-Path $path 'VC\Auxiliary\Build\vcvars64.bat'
+            if (Test-Path -LiteralPath $candidate) { $vcvars = $candidate }
+        }
+    }
+}
 
 if (-not $vcvars) {
     Bad 'vcvars64.bat not found.'

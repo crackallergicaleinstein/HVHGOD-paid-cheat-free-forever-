@@ -1,5 +1,7 @@
 # HVHGOD SLUTS — standalone internal, free, no bullshit
 
+**[Download the cheat DLL (payload.clean.dll) →](../../releases/latest)**
+
 A cracked, serverless build of the HVHGOD internal for Counter-Strike 2. No
 loader, no account, no subscription, no vendor backend sniffing your machine, no
 telemetry. The whole thing is here: the launcher, the mapper, the patcher, the
@@ -62,7 +64,7 @@ compile it, this isn't for you.
 ## Quick start
 
 ```
-1. Download payload.clean.dll from the Releases page
+1. Download `payload.clean.dll` from the Releases page (top of this repo)
 2. Put it at payload\payload.clean.dll
 3. pwsh -File build.ps1
 4. launcher\bin\hvhgod-launcher.exe
