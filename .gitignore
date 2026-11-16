@@ -1,0 +1,33 @@
+# the payload binary: 60 MB, shipped as a Release asset instead
+payload/*.dll
+payload/*.bin
+
+# build output - never committed, build.ps1 produces it
+bin/
+*.exe
+*.dll
+!data/
+*.obj
+*.pdb
+*.ilk
+*.exp
+*.lib
+
+# per-machine runtime state
+dump/
+work/pipeline.log
+work/progress.txt
+work/*.dll
+work/*.bmp
+*.bridge
+!data/offsets.genuine.bridge
+
+# editor noise
+.vs/
+*.user
+*.suo
+obj/
+__pycache__/
+
+# release assets (built, uploaded separately)
+assets-release/

@@ -1,0 +1,35 @@
+name: ci
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PowerShell parse check
+        shell: pwsh
+        run: |
+          $bad = 0
+          Get-ChildItem -Recurse -File -Filter *.ps1 | ForEach-Object {
+            $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$errors)
+            if ($errors.Count -gt 0) {
+              $bad++
+              Write-Host "::error file=$($_.Name)::$($errors[0].Message)"
+            }
+          }
+          if ($bad -gt 0) { exit 1 }
+          Write-Host "all scripts parse"
+
+      - name: Personal data scan
+        shell: pwsh
+        run: pwsh -NoProfile -File tools\check-clean.ps1
+
+      - name: Build tools
+        shell: pwsh
+        run: pwsh -NoProfile -File build.ps1 -NoPayload
