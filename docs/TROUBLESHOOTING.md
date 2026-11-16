@@ -3,6 +3,22 @@
 Symptom → cause → fix. Everything the pipeline prints is also written to
 `work\pipeline.log` and to `%LOCALAPPDATA%\HVHGOD\CS2 Runtime\Internal\Logs\`.
 
+## The rage bot does nothing
+
+Not a bug, not a missing config, not a stale offset. **Rage bot is temporarily
+disabled in this build** — no rage bot, no auto wall, no resolver. Legit bot,
+vision, antiaim, movement and skins all work.
+
+Fix for right now: crank the legit bot instead. Smoothing 0-2, FOV 90-180,
+head-only, autofire delay 0, backtracks maxed, trigger delay 0. That is a
+rage-grade config living in the legit tab, and it is the closest thing to the
+missing module.
+
+Fix for good: the rage bot comes back when donations cover the work. The address
+is at the top of the README and in its Donate section. Do not install a "rage bot
+patch" from a Telegram group to get it back early — that is how people get ratted
+and lose the account anyway.
+
 ## VAC refuses secure servers
 
 ```

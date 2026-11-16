@@ -2,6 +2,11 @@
 
 Status: **working**. Verified 2026-11-16 02:18–02:19 on cs2 pid 19996.
 
+> The run below was captured before the rage bot was switched off in this build.
+> Rage bot is currently disabled; the line and the module are not part of a
+> working session any more. Legit bot, vision, antiaim, movement and skins are.
+> See `docs\TROUBLESHOOTING.md` -> "The rage bot does nothing".
+
 ```
 INITIALIZATION_SUCCESS  state=loader_signaled core=validated events=ready render_input=ready
 RENDER_RUNTIME_READY    backend=ready fonts=ready window_input=ready

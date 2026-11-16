@@ -30,6 +30,12 @@ What you get:
   - the whole pipeline: launch through Steam, map, attach, verify
   - full docs, full toolchain, nothing hidden behind a paywall
 
+What you get right now, specifically:
+  - legit bot, triggerbot, ESP, vision, antiaim, movement, skins
+  - no rage bot: it is temporarily disabled in this build
+  - a legit bot that takes rage-grade numbers, so crank it
+  - rage bot returns when donations cover the work
+
 What you don't get:
   - an account, a whitelist, a "premium tier", a reseller, or a single fuck given
     about the vendor's business model

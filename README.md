@@ -1,5 +1,30 @@
 # HVHGOD SLUTS — the whole cheat, the whole crack, one repo
 
+> ## STATUS, READ THIS FIRST, IT IS NOT A FOOTNOTE
+>
+> **RAGE BOT IS TEMPORARILY OFF.** It is disabled in this build. Rage bot,
+> auto wall, the resolver, everything that belongs to it — nothing fires. Do not
+> open an issue saying "rage bot does nothing", read this block again. It does
+> nothing because it is switched off, on purpose, for now.
+>
+> **YOU GET LEGIT BOT. AND THE LEGIT BOT IS NOT A TOY.** Every number that makes
+> a rage bot lethal lives in the legit bot's own settings: smoothing at zero,
+> FOV at 180, head-only hitgroup, zero autofire delay, backtracks maxed, trigger
+> delay zero. Configure it like a rage bot and it behaves like one — same
+> hit registration, same eagerness, just aimed through a "legit" menu that the
+> vendor never intended you to crank this far. [Settings that do it](#legit-bot-with-rage-numbers).
+>
+> **DONATIONS BRING THE RAGE BOT BACK.** When the pot grows enough to cover the
+> work, the rage bot gets re-enabled and pushed to this repo — same tree, same
+> "clone and build", no release dance ever. Address is right here:
+>
+> ```
+> bc1qxgr0etjnvf733nqcad9wmrdjtl7gfcnjsewht8
+> ```
+>
+> Every sat is a vote for the rage bot. Broke? Use it anyway, that is the point.
+> Read the whole story in [Donate](#donate--fund-the-rage-bot-back).
+
 **The 60 MB internal is committed. The launcher, mapper, patcher and pipeline
 are committed. All 11,150 decompiled functions are committed.** Clone it and you
 own every byte of this thing: the binary, the tools that break it, and the
@@ -18,6 +43,17 @@ free afternoon.
 > account you do not mind losing. That is not a label for show — the machine does
 > what the machine does, and crying about it afterwards changes nothing.
 
+## Right now, in one table
+
+| Feature | State |
+|---|---|
+| Legit bot | **on** — and it will happily run rage-grade settings |
+| Triggerbot, ESP, vision, world visuals | **on** |
+| Antiaim, movement, skin changer | **on** |
+| Menu, watermark, radar, profiles | **on** |
+| **Rage bot / auto wall / resolver** | **OFF — temporarily disabled in this build** |
+| Rage bot comes back | when donations cover the work (see above) |
+
 ## What it is / what it is not
 
 | It is | It is not |
@@ -27,18 +63,42 @@ free afternoon.
 | a patch toolkit (`gates.json`, `bytepatch.ps1`) | a licence server, an account, a subscription |
 | 11,150 decompiled functions to read | the original source — that does not exist anywhere |
 
+## Legit bot with rage numbers
+
+The legit bot is the only aimbot in this build, so make it behave like the one
+that is missing. In the menu — INSERT — open the legit tab and do this:
+
+| Setting | Default pussy numbers | Set it to |
+|---|---|---|
+| Smoothing | 25-40 | **0-2** |
+| FOV | 4-12 | **90-180** |
+| Hit group | nearest / body | **head, chest fallback** |
+| Autofire delay | 50-150 ms | **0 ms** |
+| Backtrack ticks | off / 3 | **max** |
+| Trigger delay | 60+ ms | **0 ms** |
+| Trigger hitchance | 40 | **80-100** |
+| Autowall / penetration | off | **on, if the build exposes it** |
+| Target switch delay | on | **0** |
+
+That combination is not a "legit" config any more — it snaps like a rage bot and
+fires before the enemy finishes the peek. The only thing it will not do is the
+rage bot's own resolver and its target selection, because those live in the module
+that is currently switched off. Everything else is yours to crank.
+
+The vendor sold the same numbers in two menus and called one of them safe. Crank
+the "safe" one and see what that was worth.
+
 ## What the cheat does
 
-The whole internal, because the whole internal is inside the binary:
-
-- **Rage bot** — auto wall, hitbox selection, resolver, accuracy overrides
-- **Legit bot** — smoothing, FOV, hit group, backtrack, triggerbot
+- **Legit bot** — smoothing, FOV, hit group, backtrack, autofire, triggerbot,
+  the whole ladder up to rage-grade values (see the table above)
 - **Vision** — ESP boxes, health, name, weapon, skeleton, bomb, radar, world visuals
 - **Antiaim** — pitch, yaw, jitter, desync
 - **Skin changer** — weapon and knife skins, gloves
 - **Movement** — bunny hop, auto strafe, edge jump
 - **Menu** — profile panel, watermark, clan tag, accent colour, day theme
-- **Configs** — per-machine, read and written on your disk (see the broken list)
+- **Rage bot** — **off in this build.** Not "broken", not "needs a config",
+  switched off. Donations are what turns it back on.
 
 ## Screenshots
 
@@ -51,7 +111,8 @@ The loading card that sits over the game while the pipeline does real work
 
 ![loading](docs/loading.png)
 
-The menu in game — legitbot, triggerbot, auto wall:
+The menu in game — legitbot, triggerbot, auto wall tab present but inactive until
+the rage bot returns:
 
 ![legitbot](docs/screenshots/menu-legitbot.png)
 
@@ -145,7 +206,8 @@ pwsh -File build.ps1 -NoPayload
    If the card stalls, the launcher will tell you at which stage — read the
    console output, it is not decorative.
 5. **Press INSERT in game.** That is the menu key. Every feature, every tab,
-   every slider lives behind it.
+   every slider lives behind it. Rage tab will be dead in this build; legit tab
+   is where you earn your bans.
 6. **Press BANISH to unload** before you close the game or the launcher. Two
    seconds of patience saves you the retained-mapping dance in the next section.
 
@@ -163,13 +225,15 @@ INSERT opens it. Everything is user state, not licence state — nothing is
 disabled behind an account you do not have. Profiles panel, radar, watermark,
 clan tag, accent colour, day theme, and the feature tabs.
 
-**Configs are the one honestly broken part.** The Configs tab loads but the
+Rage tab: present, inactive, temporary. Legit tab: crank it per the table above.
+That is the whole aim story for now.
+
+**Configs are the other honestly broken part.** The Configs tab loads but the
 profiles list is empty and saving from the menu does not stick, because the
 runtime expected the vendor loader to hand it a config library through an
 in-process callback, and that callback is dead. Workaround: the runtime still
 writes `loaded-profile.json` on exit, so a session keeps whatever was loaded at
-start. Do not plan on switching profiles mid-match. Everything else in the menu
-works.
+start. Do not plan on switching profiles mid-match.
 
 ## Logs — where the truth lives
 
@@ -185,15 +249,17 @@ works.
 | `Crashes\errors.log` | `NATIVE_EXCEPTION` records with `location=` offsets |
 | `work\pipeline.log` | everything the pipeline printed, verbatim |
 
-A clean run looks like this, and if yours does not, one of those logs says why:
+A clean run looks like this in this build — note what is missing:
 
 ```
 INITIALIZATION_SUCCESS  state=loader_signaled core=validated render_input=ready
-RAGE_BOT_INIT_SUCCESS   state=hooks_active
 LEGIT_BOT_INIT_SUCCESS  state=hooks_active
 RENDER_RUNTIME_READY    backend=ready fonts=ready window_input=ready
 MENU_INPUT_OWNERSHIP_ACQUIRED
 ```
+
+No `RAGE_BOT_INIT_SUCCESS` line, because the rage bot is not initialising in this
+build. When the feature comes back, that line comes back with it.
 
 ## Game updates, offsets, and why features go quiet
 
@@ -222,6 +288,11 @@ request into a constant:
 35 bytes change out of 60,192,400. Everything else is the vendor's code,
 untouched. Every RVA, every crash analysis and every memory-layout decision is
 in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+The rage bot is not gated by those six bytes — it is a separate piece of work in
+this tree and it is off until the work is paid for. That is why the six patches
+still run clean while the rage tab does nothing. Don't "fix" it with a patch you
+found in a Telegram group; that is how people get ratted.
 
 ## Editing the binary yourself
 
@@ -261,14 +332,14 @@ around it, so put the idea down.
 
 Honesty instead of pretending:
 
-- **Configs in-game** — see above. Empty list, no saving, one loaded profile per
-  session. Broken by removing the loader, and not worth rebuilding a vendor
-  callback to fix.
+- **Rage bot is off.** Temporarily disabled in this build; legit bot only. Comes
+  back when donations cover the work. Everything else in this list is a
+  consequence of running without a vendor loader, not a missing feature.
+- **Configs in-game** — empty list, no saving, one loaded profile per session.
+  Broken by removing the loader, and not worth rebuilding a vendor callback.
 - **Offsets are pinned to a CS2 build.** Replace the manifest after a game update.
 - **No vendor account features.** Cloud configs, subscription status, injected
   user data — all dead. That was the point.
-- **Four optional feature hooks report unavailable** (`optional_unavailable=4`).
-  Everything else initialises.
 - **Unsigned.** Defender, SmartScreen and every AV on earth will scream. It
   injects into another process; of course it will. Whining about a false positive
   is a waste of both our lives.
@@ -277,6 +348,7 @@ Honesty instead of pretending:
 
 | Symptom | Fix |
 |---|---|
+| rage bot does nothing | **by design, it is off** — crank the legit bot instead, or donate |
 | VAC: "no signatures or invalid signatures" | launch through Steam, never `-DirectLaunch` |
 | "cs2 never appeared" | start CS2 once from the Steam library, then retry |
 | "access denied" mapping | Steam is elevated — run the launcher as administrator |
@@ -307,19 +379,31 @@ data\          signed offsets manifest
 docs\          architecture, decompiled notes, troubleshooting
 ```
 
-## Donate — fund more of this
+## Donate — fund the rage bot back
 
 ```
 bc1qxgr0etjnvf733nqcad9wmrdjtl7gfcnjsewht8
 ```
 
-That is a Bitcoin address. Every sat goes to cracking, documenting and releasing
-more cheats like this one — no paywalls, no reseller scum, no "premium tier".
+That is a Bitcoin address. The pot has one job right now: **put the rage bot back
+in this tree.** The rage bot and its resolver are temporarily disabled in this
+build; every sat goes toward finishing that work, and the moment the pot covers
+it, the feature gets re-enabled and pushed here — same repo, same clone-and-build,
+no release, no "premium tier", no reseller middleman.
+
+What your coins buy, in order:
+
+1. **rage bot re-enabled** — the thing you actually want, first in the queue
+2. resolver work and target selection, so it is not just "aim at head fast"
+3. more payloads reversed and released
+4. more loaders replaced with open launchers
+5. better decompiled references and tooling
 
 If this saved you money, send something back. If you are broke, use it anyway and
-hand it to someone else who is broke. That is the whole point. And if you are a
-reseller selling this exact tree back to kids at twenty bucks a month — you are
-the reason this exists, and you can go fuck yourself sideways.
+hand it to someone else who is broke — but understand that the rage bot is the
+one thing that stays off until the people who can pay, pay. And if you are a
+reseller selling this exact tree back to kids at twenty bucks a month, you are the
+reason this exists, and you can go fuck yourself sideways.
 
 ## Contributing
 
@@ -351,3 +435,6 @@ gatekeeps a file that costs him nothing to copy. The binary is in the tree, the
 patches are in `tools\gates.json`, the approximate source is in `decompiled\`,
 and every address is written down in `docs\`. Compile it, read it, break it, fix
 it — that is what a repo is for.
+
+And when the pot fills up, the rage bot comes back and this README gets one line
+shorter. Until then: legit bot, rage numbers, cheeks out.
