@@ -26,9 +26,17 @@ The loading card that sits over the game while the pipeline does real work
 
 ![loading](docs/loading.png)
 
-The numbers are not a fake animation. `run-standalone.ps1` writes a progress file
-at every real stage and the overlay reads it — see `tools/overlay/overlay.cpp`
-and `work/progress.txt` in the pipeline.
+The menu in game — legitbot, triggerbot, auto wall:
+
+![legitbot](docs/screenshots/menu-legitbot.png)
+
+Profile panel, radar, watermark, clan tag, accent colour, day theme:
+
+![profile](docs/screenshots/menu-profile.png)
+
+The numbers on the loading card are not a fake animation. `run-standalone.ps1`
+writes a progress file at every real stage and the overlay reads it — see
+`tools/overlay/overlay.cpp` and `work/progress.txt` in the pipeline.
 
 ## What it does
 

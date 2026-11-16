@@ -56,6 +56,8 @@ empty — Windows Explorer shows folders at the top level, so open them.
 | `docs\STANDALONE-HOWTO.md` | long-form engineering notes from the build-out |
 | `launcher\DESIGN.md` | brief for restyling the launcher |
 | `payload\README.txt` | where the payload goes |
+| `docs\launcher.png`, `docs\loading.png` | launcher skin and the real loading card |
+| `docs\screenshots\` | in-game menu screenshots (legitbot, profile panel) |
 
 ## Rebuild everything
 
