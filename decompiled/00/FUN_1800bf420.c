@@ -1,0 +1,272 @@
+// FUN_1800bf420 - decompiled reference (Ghidra). Not original source, does not compile.
+
+/* 1800bf420 */
+
+/* WARNING: Function: __security_check_cookie replaced with injection: security_check_cookie */
+
+void FUN_1800bf420(longlong param_1)
+
+{
+  undefined *puVar1;
+  undefined1 (*pauVar2) [16];
+  longlong lVar3;
+  longlong lVar4;
+  longlong lVar5;
+  longlong lVar6;
+  longlong lVar7;
+  undefined **ppuVar8;
+  undefined1 auStack_198 [32];
+  undefined1 *local_178;
+  undefined1 local_170;
+  undefined1 *local_168;
+  ulonglong uStack_160;
+  undefined8 local_158;
+  undefined1 *local_148;
+  ulonglong local_140;
+  char *local_138;
+  ulonglong uStack_130;
+  undefined8 local_128;
+  undefined1 local_118 [16];
+  undefined8 local_108;
+  undefined8 local_100;
+  undefined1 local_f8 [16];
+  undefined8 local_e8;
+  undefined8 local_e0;
+  undefined1 local_d8 [16];
+  undefined8 local_c8;
+  undefined8 local_c0;
+  char *local_b8;
+  undefined8 local_b0;
+  char *local_a8;
+  undefined8 local_a0;
+  undefined1 *local_98;
+  ulonglong local_90;
+  char *local_88;
+  undefined8 local_80;
+  undefined1 local_78 [16];
+  undefined1 local_68 [16];
+  longlong local_58;
+  undefined1 local_50 [16];
+  ulonglong uStack_40;
+  ulonglong uStack_38;
+  ulonglong local_30;
+  
+  local_30 = DAT_1808d5f00 ^ (ulonglong)auStack_198;
+  lVar3 = 0;
+  local_148 = local_50;
+  local_50 = (undefined1  [16])0x0;
+  uStack_40 = 0;
+  uStack_38 = 0;
+  local_58 = param_1;
+  FUN_18015ba30(local_50,"chams items",0xb);
+  local_118 = (undefined1  [16])0x0;
+  local_108 = 0;
+  local_100 = 0;
+  FUN_18015ba30(local_118,"item chams",10);
+  local_168 = (undefined1 *)0x0;
+  uStack_160 = uStack_160 & 0xffffffffffffff00;
+  local_158 = 0;
+  local_138 = (char *)0x0;
+  uStack_130 = uStack_160;
+  local_128 = 0;
+  local_170 = 0;
+  local_178 = local_50;
+  FUN_18015a8b0(param_1,1,&local_138,local_118);
+  local_b8 = local_d8;
+  local_d8 = (undefined1  [16])0x0;
+  local_c8 = 0;
+  local_c0 = 0;
+  FUN_18015ba30(local_d8,"chams items",0xb);
+  local_f8 = (undefined1  [16])0x0;
+  local_e8 = 0;
+  local_e0 = 0;
+  lVar6 = 6;
+  FUN_18015ba30(local_f8,"pistol",6);
+  local_168 = (undefined1 *)0x0;
+  uStack_160 = uStack_160 & 0xffffffffffffff00;
+  local_158 = 0;
+  local_138 = (char *)0x0;
+  uStack_130 = uStack_160;
+  local_128 = 0;
+  local_170 = 0;
+  local_178 = local_d8;
+  FUN_18015a8b0(param_1 + 0x68,0,&local_138,local_f8);
+  local_b8 = local_50;
+  local_50 = (undefined1  [16])0x0;
+  uStack_40 = 0;
+  uStack_38 = 0;
+  FUN_18015ba30(local_50,"chams items",0xb);
+  local_118 = (undefined1  [16])0x0;
+  local_108 = 0;
+  local_100 = 0;
+  FUN_18015ba30(local_118,&DAT_1806bd47c,3);
+  local_168 = (undefined1 *)0x0;
+  uStack_160 = uStack_160 & 0xffffffffffffff00;
+  local_158 = 0;
+  local_138 = (char *)0x0;
+  uStack_130 = uStack_160;
+  local_128 = 0;
+  local_170 = 0;
+  local_178 = local_50;
+  FUN_18015a8b0(param_1 + 0xd0,0,&local_138,local_118);
+  local_b8 = local_d8;
+  local_d8 = (undefined1  [16])0x0;
+  local_c8 = 0;
+  local_c0 = 0;
+  FUN_18015ba30(local_d8,"chams items",0xb);
+  local_f8 = (undefined1  [16])0x0;
+  local_e8 = 0;
+  local_e0 = 0;
+  FUN_18015ba30(local_f8,"rifle",5);
+  local_168 = (undefined1 *)0x0;
+  uStack_160 = uStack_160 & 0xffffffffffffff00;
+  local_158 = 0;
+  local_138 = (char *)0x0;
+  uStack_130 = uStack_160;
+  local_128 = 0;
+  local_170 = 0;
+  local_178 = local_d8;
+  FUN_18015a8b0(param_1 + 0x138,0,&local_138,local_f8);
+  local_b8 = local_50;
+  local_50 = (undefined1  [16])0x0;
+  uStack_40 = 0;
+  uStack_38 = 0;
+  FUN_18015ba30(local_50,"chams items",0xb);
+  local_118 = (undefined1  [16])0x0;
+  local_108 = 0;
+  local_100 = 0;
+  FUN_18015ba30(local_118,"shotgun",7);
+  local_168 = (undefined1 *)0x0;
+  uStack_160 = uStack_160 & 0xffffffffffffff00;
+  local_158 = 0;
+  local_138 = (char *)0x0;
+  uStack_130 = uStack_160;
+  local_128 = 0;
+  local_170 = 0;
+  local_178 = local_50;
+  FUN_18015a8b0(param_1 + 0x1a0,0,&local_138,local_118);
+  local_b8 = local_d8;
+  local_d8 = (undefined1  [16])0x0;
+  local_c8 = 0;
+  local_c0 = 0;
+  FUN_18015ba30(local_d8,"chams items",0xb);
+  local_f8 = (undefined1  [16])0x0;
+  local_e8 = 0;
+  local_e0 = 0;
+  FUN_18015ba30(local_f8,"sniper",6);
+  local_168 = (undefined1 *)0x0;
+  uStack_160 = uStack_160 & 0xffffffffffffff00;
+  local_158 = 0;
+  local_138 = (char *)0x0;
+  uStack_130 = uStack_160;
+  local_128 = 0;
+  local_170 = 0;
+  local_178 = local_d8;
+  FUN_18015a8b0(param_1 + 0x208,1,&local_138,local_f8);
+  local_b8 = local_50;
+  local_50 = (undefined1  [16])0x0;
+  uStack_40 = 0;
+  uStack_38 = 0;
+  FUN_18015ba30(local_50,"chams items",0xb);
+  local_118 = (undefined1  [16])0x0;
+  local_108 = 0;
+  local_100 = 0;
+  FUN_18015ba30(local_118,"utility",7);
+  local_168 = (undefined1 *)0x0;
+  uStack_160 = uStack_160 & 0xffffffffffffff00;
+  local_158 = 0;
+  local_138 = (char *)0x0;
+  uStack_130 = uStack_160;
+  local_128 = 0;
+  local_170 = 0;
+  local_178 = local_50;
+  FUN_18015a8b0(param_1 + 0x270,1,&local_138,local_118);
+  FUN_18063ab10(param_1 + 0x2d8,0,0x1500);
+  FUN_1800e7cb0(param_1 + 0x2d8);
+  *(undefined8 *)(param_1 + 0x17d8) = 0;
+  *(undefined8 *)(param_1 + 0x17e0) = 0;
+  *(undefined8 *)(param_1 + 0x17e8) = 0;
+  *(undefined8 *)(param_1 + 0x17f0) = 0;
+  *(undefined8 *)(param_1 + 0x17f8) = 0;
+  *(undefined8 *)(param_1 + 0x1800) = 0;
+  *(undefined8 *)(param_1 + 0x1808) = 0;
+  *(undefined8 *)(param_1 + 0x1810) = 0;
+  *(undefined8 *)(param_1 + 0x1818) = 0;
+  lVar7 = 0;
+  lVar5 = 0x1808;
+  ppuVar8 = &PTR_s_pistol_1806ff2f8;
+  do {
+    puVar1 = *ppuVar8;
+    local_78 = (undefined1  [16])0x0;
+    local_68 = (undefined1  [16])0x0;
+    FUN_18015ba30(local_78,"chams items - ",0xe);
+    lVar4 = -1;
+    do {
+      lVar4 = lVar4 + 1;
+    } while (puVar1[lVar4] != '\0');
+    pauVar2 = (undefined1 (*) [16])FUN_18015b2a0(local_78,puVar1);
+    local_50 = *pauVar2;
+    uStack_40 = *(ulonglong *)pauVar2[1];
+    uStack_38 = *(ulonglong *)(pauVar2[1] + 8);
+    (*pauVar2)[0] = 0;
+    *(undefined8 *)pauVar2[1] = 0;
+    *(undefined8 *)(pauVar2[1] + 8) = 0xf;
+    FUN_18015c010(local_78);
+    local_148 = local_50;
+    if (0xf < uStack_38) {
+      local_148 = (undefined1 *)local_50._0_8_;
+    }
+    local_b8 = "primary visibility";
+    local_b0 = 0x12;
+    local_140 = uStack_40;
+    FUN_1800f3030(param_1 + 0x17d8 + lVar3,&local_148,&local_b8);
+    local_98 = local_50;
+    if (0xf < uStack_38) {
+      local_98 = (undefined1 *)local_50._0_8_;
+    }
+    local_a8 = "secondary visibility";
+    local_a0 = 0x14;
+    local_90 = uStack_40;
+    FUN_1800f3030(param_1 + 0x17f0 + lVar3,&local_98,&local_a8);
+    *(undefined4 *)(param_1 + lVar5) = 0x42c80000;
+    local_f8._0_8_ = local_50;
+    if (0xf < uStack_38) {
+      local_f8._0_8_ = local_50._0_8_;
+    }
+    local_88 = "max distance";
+    local_80 = 0xc;
+    local_f8._8_8_ = uStack_40;
+    FUN_1800f2e80(param_1 + 0x1808 + lVar3,local_f8,&local_88);
+    local_118._0_8_ = local_50;
+    if (0xf < uStack_38) {
+      local_118._0_8_ = local_50._0_8_;
+    }
+    local_d8._8_8_ = 0xd;
+    local_d8._0_8_ = "primary layer";
+    local_118._8_8_ = uStack_40;
+    FUN_1800bacc0(param_1 + 0x340 + lVar7,local_118,local_d8);
+    local_168 = local_50;
+    if (0xf < uStack_38) {
+      local_168 = (undefined1 *)local_50._0_8_;
+    }
+    local_138 = "secondary layer";
+    uStack_130 = 0xf;
+    uStack_160 = uStack_40;
+    FUN_1800bacc0(param_1 + 0x448 + lVar7,&local_168,&local_138);
+    FUN_18015c010(local_50);
+    lVar3 = lVar3 + 4;
+    lVar7 = lVar7 + 0x380;
+    lVar5 = lVar5 + 4;
+    ppuVar8 = ppuVar8 + 1;
+    lVar6 = lVar6 + -1;
+  } while (lVar6 != 0);
+  *(undefined1 *)(param_1 + 0x1140) = 1;
+  *(undefined4 *)(param_1 + 0x11a8) = 0xffeeeeee;
+  *(undefined1 *)(param_1 + 0x11b8) = 3;
+  *(undefined1 *)(param_1 + 0x14c0) = 1;
+  *(undefined4 *)(param_1 + 0x1528) = 0xffeeeeee;
+  *(undefined1 *)(param_1 + 0x1538) = 3;
+}
+
+
+

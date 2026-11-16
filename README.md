@@ -1,26 +1,44 @@
-# HVHGOD SLUTS — standalone internal, cracked, free, no bullshit
+# HVHGOD SLUTS — the whole cheat, the whole crack, one repo
 
-**The cheat itself is in this repo. `payload\payload.clean.dll`, 60,192,400
-bytes, committed, sitting right there in the tree.** No release scavenger hunt,
-no "check the pinned message", no dead Discord invite from a guy who calls
-himself a "provider". Clone it, build it, play. That is the entire flow, you
-lazy fucks.
+**The 60 MB internal is committed. The launcher, mapper, patcher and pipeline
+are committed. All 11,150 decompiled functions are committed.** Clone it and you
+own every byte of this thing: the binary, the tools that break it, and the
+approximate source that tells you what is inside it. No release tab, no download
+link, no "join the Discord and verify", no reseller gatekeeping a file that costs
+him nothing to copy.
 
 A cracked, serverless build of the HVHGOD internal for Counter-Strike 2. No
 loader, no account, no subscription, no vendor backend sniffing your machine, no
-telemetry. The whole thing is here: the binary, the launcher, the mapper, the
-patcher, the pipeline, the docs. Take it, build it, play.
-
-No payment. No whitelist. No "contact me on telegram". The vendor sells this for
-money and bans you for sharing it — so here it is, binary and all, for everyone
-who can't or won't pay for a cheat that runs on their own fucking computer.
+telemetry. Sixty megabytes of paid software, undone with thirty-five bytes and a
+free afternoon.
 
 > It is cheat software. It injects into `cs2.exe`, it is unsigned, and VAC bans
 > are permanent and hardware-linked. Read [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 > before you drag it onto a VAC-secured server, and eat the first test on an
-> account you do not mind losing. That is not a warning label for show — the
-> machine does what the machine does, and no amount of crying in a forum
-> changes that.
+> account you do not mind losing. That is not a label for show — the machine does
+> what the machine does, and crying about it afterwards changes nothing.
+
+## What it is / what it is not
+
+| It is | It is not |
+|---|---|
+| the vendor's internal image, gates removed | a cheat somebody wrote in this repo |
+| a local launcher that maps it into `cs2.exe` | a loader that phones home |
+| a patch toolkit (`gates.json`, `bytepatch.ps1`) | a licence server, an account, a subscription |
+| 11,150 decompiled functions to read | the original source — that does not exist anywhere |
+
+## What the cheat does
+
+The whole internal, because the whole internal is inside the binary:
+
+- **Rage bot** — auto wall, hitbox selection, resolver, accuracy overrides
+- **Legit bot** — smoothing, FOV, hit group, backtrack, triggerbot
+- **Vision** — ESP boxes, health, name, weapon, skeleton, bomb, radar, world visuals
+- **Antiaim** — pitch, yaw, jitter, desync
+- **Skin changer** — weapon and knife skins, gloves
+- **Movement** — bunny hop, auto strafe, edge jump
+- **Menu** — profile panel, watermark, clan tag, accent colour, day theme
+- **Configs** — per-machine, read and written on your disk (see the broken list)
 
 ## Screenshots
 
@@ -41,85 +59,133 @@ Profile panel, radar, watermark, clan tag, accent colour, day theme:
 
 ![profile](docs/screenshots/menu-profile.png)
 
-The numbers on the loading card are not a fake animation for smoothbrains who
+Those numbers on the loading card are not a fake animation for smoothbrains who
 need a progress bar to feel something. `run-standalone.ps1` writes a progress
 file at every real stage and the overlay reads it — see
-`tools/overlay/overlay.cpp` and `work/progress.txt` in the pipeline.
+`tools/overlay/overlay.cpp` and `work/progress.txt`.
 
-## What it does
+## What is in the repo
 
-| Stage | What happens |
+| Path | What it is |
 |---|---|
-| Launch | opens the game through Steam (`steam://rungameid/730`), waits for the engine |
-| Map | maps a patched copy of the internal image into `cs2.exe` with a manual PE mapper |
-| Repair | rewrites the import slots the mapper cannot fill (`d2d1`, the Configs crash), then clears the DOS magic |
-| Attach | invokes the image entry point with the handshake block |
-| Verify | reads the runtime's own logs and tells you the truth |
+| `payload\payload.clean.dll` | the internal image, 60,192,400 bytes, committed |
+| `decompiled\00` .. `06` | 11,150 functions, `FUN_<address>.c` each, approximate source |
+| `launcher\src\launcher.cpp` | the Win32 launcher: window, drawing, pipeline driver |
+| `loader\XMap.cs` | manual PE mapper — relocations, imports, `.pdata`, TLS |
+| `work\run-standalone.ps1` | the pipeline: preflight, stage, launch, map, attach, verify |
+| `tools\strip_gates.ps1`, `tools\gates.json` | the six patches, as code and as data |
+| `tools\bytepatch.ps1` | any byte edit from a JSON list, with an expect-check |
+| `tools\iatfix`, `tools\caller`, `tools\overlay` | import repair, entry caller, loading card |
+| `tools\ghidra\DumpDecomp.java`, `tools\split_decomp.ps1` | regenerate and split the reference |
+| `data\offsets.genuine.bridge` | signed offsets manifest, 3,071 entries, v28 |
+| `docs\` | architecture, decompiled notes, troubleshooting, build-out notes |
+
+Full file map: [FILES.md](FILES.md).
 
 ## Requirements
 
 - Windows 10 19044+ or Windows 11, x64
-- Steam and Counter-Strike 2
+- Steam, signed in, with Counter-Strike 2 installed
 - PowerShell 7 — `winget install Microsoft.PowerShell`
 - Visual Studio 2022 BuildTools with the Desktop C++ workload —
   `winget install Microsoft.VisualStudio.2022.BuildTools`
 
 Nothing is prebuilt except the closed-source image the vendor already compiled.
-`build.ps1` compiles the rest with `cl /W4`. If you can't compile four small
-tools on your own machine, this isn't for you — go buy the subscription and get
-fleeced like the rest of the paste-eaters.
+`build.ps1` compiles four small tools with `cl /W4`. If you cannot compile four
+small tools on your own machine, this is not for you — go buy the subscription
+and get fleeced like the rest of the paste-eaters.
 
-## Quick start
+## Install — the whole thing, in order
+
+```powershell
+# 1. get the tree (the payload is in it, you do not download anything else)
+git clone https://github.com/crackallergicaleinstein/HVHGOD-paid-cheat-free-forever-.git
+cd HVHGOD-paid-cheat-free-forever-
+
+# 2. check your toolchain is there before you blame the repo
+where.exe cl.exe
+
+# 3. build: strip the six gates, compile launcher/iatfix/caller/overlay, scan the tree
+pwsh -File build.ps1
+
+# 4. run it
+.\launcher\bin\hvhgod-launcher.exe
+```
+
+Expect this at the end of `build.ps1`:
 
 ```
-1. git clone this repo
-2. pwsh -File build.ps1
-3. launcher\bin\hvhgod-launcher.exe
+[build] payload.stripped.dll 60,192,400 bytes
+[build] launcher        ... bytes
+[build] iatfix          ... bytes
+[build] caller          ... bytes
+[build] overlay         ... bytes
+[check-clean] clean - no personal paths, no configs, no credentials
+[build] ready
 ```
-
-The 60 MB payload is already in `payload\` because it is committed to the
-branch. There is no step 0, no download link, no "asset missing" whining. If
-`payload\payload.clean.dll` isn't there, you cloned like a headless chicken —
-clone the right repo.
-
-Press **SUMMON**. Watch the loading card. Press **INSERT** in game.
 
 Only want the tools, not the 60 MB strip pass?
 
-```
+```powershell
 pwsh -File build.ps1 -NoPayload
 ```
 
-## Known shit that does not work
+## Using it, click by click
 
-Being honest instead of pretending:
+1. **Double-click `launcher\bin\hvhgod-launcher.exe`.** No install, no service,
+   no admin by default.
+2. **Read the chips before you press anything.** `PAYLOAD`, `OFFSETS`, `RUNTIME`,
+   `LOGS`, `SECURITY`, `TARGET` — each one is a real check, and the status line
+   tells you `STANDBY`, `READY`, `SUMMONING`, `FEASTING` or `DEAD`.
+3. **Press SUMMON.** The pipeline opens CS2 through Steam
+   (`steam://rungameid/730`), waits for the engine, maps the patched image into
+   `cs2.exe`, repairs the imports, invokes the entry point, wipes the DOS magic,
+   then reads the runtime's own log and tells you the truth.
+4. **Wait for the loading card to finish and the launcher to say it is alive.**
+   If the card stalls, the launcher will tell you at which stage — read the
+   console output, it is not decorative.
+5. **Press INSERT in game.** That is the menu key. Every feature, every tab,
+   every slider lives behind it.
+6. **Press BANISH to unload** before you close the game or the launcher. Two
+   seconds of patience saves you the retained-mapping dance in the next section.
 
-- **Configs in-game are broken.** The Configs tab loads and the profiles list is
-  empty, and saving from the menu does not stick. The runtime expects the config
-  library to be handed to it by the vendor loader over an in-process callback; we
-  killed that callback to run without the loader, so the menu has no source for
-  the list. Files in `%LOCALAPPDATA%\HVHGOD\CS2 Runtime\Internal\Bridge\Configuration\`
-  exist but the tab does not populate from them reliably.
-  **Workaround:** the runtime still writes `loaded-profile.json` on exit — settings
-  that were already loaded stay loaded for that session. Do not expect to switch
-  profiles mid-match. Cope.
-- **Offsets are pinned to a CS2 build.** After a game update, replace
-  `data\offsets.genuine.bridge`. The six patches do not change; the offsets do.
-  A game update is not the repo's fault, so don't open an issue about it like it
-  is a personal betrayal.
-- **No vendor account features.** Anything that needed the HVHGOD backend —
-  cloud configs, subscription status, injected user data — is dead. That was the
-  point. If you wanted the subscription anyway, nobody is stopping you from
-  paying twice for the same binary.
-- **Four optional feature hooks report unavailable.** The runtime says
-  `optional_unavailable=4`. Everything else initialises.
-- **Unsigned.** Defender, SmartScreen and every AV on earth will scream. It
-  injects into another process; of course it will. Whining to me about a false
-  positive is a waste of both our lives.
+| Control | What it does |
+|---|---|
+| `SUMMON` | full pipeline: steam launch → map → repair → attach → verify |
+| `BANISH` | unload, release the mapping, stop the runtime |
+| `REFRESH` | re-run the preflight checks and re-read state |
+| `MENU KEY` | INSERT, always has been |
+| `SPAWN LOG` | dumps the runtime log to your screen |
 
-## What works
+## The in-game menu
 
-Verified on a live session, not claimed by some dickhead in a Telegram channel:
+INSERT opens it. Everything is user state, not licence state — nothing is
+disabled behind an account you do not have. Profiles panel, radar, watermark,
+clan tag, accent colour, day theme, and the feature tabs.
+
+**Configs are the one honestly broken part.** The Configs tab loads but the
+profiles list is empty and saving from the menu does not stick, because the
+runtime expected the vendor loader to hand it a config library through an
+in-process callback, and that callback is dead. Workaround: the runtime still
+writes `loaded-profile.json` on exit, so a session keeps whatever was loaded at
+start. Do not plan on switching profiles mid-match. Everything else in the menu
+works.
+
+## Logs — where the truth lives
+
+```
+%LOCALAPPDATA%\HVHGOD\CS2 Runtime\Internal\Logs\
+```
+
+| File | What it tells you |
+|---|---|
+| `Lifecycle\runtime.log` | init and lifecycle events, `INITIALIZATION_FAILURE` details |
+| `Bridge\bridge.log` | the feature handshake |
+| `Misc\features.log` | feature bindings |
+| `Crashes\errors.log` | `NATIVE_EXCEPTION` records with `location=` offsets |
+| `work\pipeline.log` | everything the pipeline printed, verbatim |
+
+A clean run looks like this, and if yours does not, one of those logs says why:
 
 ```
 INITIALIZATION_SUCCESS  state=loader_signaled core=validated render_input=ready
@@ -129,15 +195,20 @@ RENDER_RUNTIME_READY    backend=ready fonts=ready window_input=ready
 MENU_INPUT_OWNERSHIP_ACQUIRED
 ```
 
-Rage bot, legit bot, ESP, antiaim, skin changer, movement, world visuals — the
-whole internal, because the whole internal is inside the binary that is now
-sitting in your checkout. We didn't write a cheat, we removed a licence check.
-That's it. That's the entire heist.
+## Game updates, offsets, and why features go quiet
 
-## How it works (short version)
+The runtime reads its offsets manifest from
+`%LOCALAPPDATA%\HVHGOD\CS2 Runtime\Internal\Bridge\Offsets\offsets.bridge`, and
+`data\offsets.genuine.bridge` is what the pipeline stages there. The six patches
+are build-independent; the offsets are not. After a CS2 update the manifest goes
+stale and features lose their addresses. Replace the file; do not touch the
+patches. A game update is not the repo's fault, so do not open an issue about it
+like it is a personal betrayal.
 
-The internal image gates every feature on one byte. Six patches turn the
-permission request into a constant:
+## How the crack works (short version)
+
+The internal gates every feature on one byte. Six patches turn the permission
+request into a constant:
 
 ```
 0x001950  delivery verifier        mov al,1 ; ret
@@ -149,61 +220,92 @@ permission request into a constant:
 ```
 
 35 bytes change out of 60,192,400. Everything else is the vendor's code,
-untouched. Sixty megabytes of paid software, undone with thirty-five bytes and a
-free afternoon. The long version with every RVA and crash analysis is in
-[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+untouched. Every RVA, every crash analysis and every memory-layout decision is
+in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-The internal image itself is closed source. There is no C++ source for it
-anywhere, and none was used here — stop asking for the "real source", it does
-not exist, the vendor never gave it to anyone. A Ghidra reconstruction is
-published as `decompiled-reference.zip` — 11,150 functions, useful for reading,
-does not compile, is not the original. See [docs/DECOMPILED.md](docs/DECOMPILED.md).
+## Editing the binary yourself
 
-## Configs are yours, on your machine
+The approximate source is here so you can stop guessing. Example — find out what
+the AUTH stub used to do before it got patched, then change something else:
 
+```powershell
+# the gate function itself
+Get-Content decompiled\00\FUN_1800e4230.c
+
+# grep the whole reconstruction for the byte that enables everything
+Get-ChildItem decompiled -Recurse -Filter *.c | Select-String -Pattern 'DAT_21468219048'
+
+# apply your own edits, with an expect-check so a wrong offset fails loudly
+pwsh -File tools\bytepatch.ps1 -List my-patches.json -In payload\payload.clean.dll -Out work\payload.stripped.dll
 ```
-%LOCALAPPDATA%\HVHGOD\CS2 Runtime\Internal\Bridge\Configuration\config-library.bridge
-```
 
-Nothing in this repo ships a config library. Every machine starts empty and keeps
-its own. The file is gitignored; your profiles never leave your PC, and nobody
-here wants your dogshit crosshair settings anyway.
+`tools\gates.json` is the six-patch list as data — copy its shape for your own.
+The reference does not compile, by design; it is there to read, not to build.
+More: [decompiled/README.md](decompiled/README.md) and
+[docs/DECOMPILED.md](docs/DECOMPILED.md).
 
 ## Command line
 
 ```powershell
 pwsh -File work\run-standalone.ps1
 pwsh -File work\run-standalone.ps1 -BootSeconds 30 -WatchMinutes 2
+pwsh -File work\run-standalone.ps1 -NoSweep
 ```
 
 `-DirectLaunch` starts `cs2.exe` without Steam. Debug only — VAC refuses secure
-servers for a game that isn't part of Steam's launch chain. That is exactly the
-"no signatures" dialog you get if you skip Steam, and no, there is no clever
-trick around it, so put the idea down.
+servers for a game that is not part of Steam's launch chain, and that is exactly
+the "no signatures" dialog you get if you skip Steam. There is no clever trick
+around it, so put the idea down.
+
+## Known shit that does not work
+
+Honesty instead of pretending:
+
+- **Configs in-game** — see above. Empty list, no saving, one loaded profile per
+  session. Broken by removing the loader, and not worth rebuilding a vendor
+  callback to fix.
+- **Offsets are pinned to a CS2 build.** Replace the manifest after a game update.
+- **No vendor account features.** Cloud configs, subscription status, injected
+  user data — all dead. That was the point.
+- **Four optional feature hooks report unavailable** (`optional_unavailable=4`).
+  Everything else initialises.
+- **Unsigned.** Defender, SmartScreen and every AV on earth will scream. It
+  injects into another process; of course it will. Whining about a false positive
+  is a waste of both our lives.
+
+## Troubleshooting, the fast table
+
+| Symptom | Fix |
+|---|---|
+| VAC: "no signatures or invalid signatures" | launch through Steam, never `-DirectLaunch` |
+| "cs2 never appeared" | start CS2 once from the Steam library, then retry |
+| "access denied" mapping | Steam is elevated — run the launcher as administrator |
+| runtime initialises then disables everything | BANISH, wait two seconds, SUMMON |
+| "runtime did not become ready" | read `Lifecycle\runtime.log`, then `Crashes\errors.log` |
+| Configs tab crashes the game | `iatfix` did not run — confirm `iatfix: N slots repaired` |
+| features dead after a CS2 update | replace `data\offsets.genuine.bridge` |
+| launcher shows chips, game is empty | press INSERT and check the feature master |
+
+Every one of these with the exact console output and cause:
+[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
 
 ## Building from source
 
 ```powershell
-pwsh -File build.ps1            # strip payload + compile launcher/iatfix/caller/overlay + clean scan
+pwsh -File build.ps1            # strip payload + compile tools + clean scan
 pwsh -File build.ps1 -NoPayload # tools only
 ```
 
-Layout:
-
 ```
 payload\       payload.clean.dll (60 MB, committed) + readme
+decompiled\    approximate source, one file per function
 launcher\      Win32 launcher (source + build.bat)
 loader\        XMap.cs — manual PE mapper
 work\          run-standalone.ps1 — the pipeline
-tools\         strip_gates.ps1, bytepatch.ps1, gates.json, iatfix, caller, overlay, ghidra, check-clean
+tools\         strip_gates, bytepatch, gates.json, iatfix, caller, overlay, ghidra, split_decomp, check-clean
 data\          signed offsets manifest
-docs\          architecture, troubleshooting, decompiled notes
+docs\          architecture, decompiled notes, troubleshooting
 ```
-
-Want to tweak the binary yourself? `tools\bytepatch.ps1` applies any byte edit
-from a JSON list with an `expect` check, and `tools\gates.json` shows the six
-patches as data. That's how you start modifying functions without source —
-poke it, break it, fix it, that's called learning.
 
 ## Donate — fund more of this
 
@@ -214,21 +316,14 @@ bc1qxgr0etjnvf733nqcad9wmrdjtl7gfcnjsewht8
 That is a Bitcoin address. Every sat goes to cracking, documenting and releasing
 more cheats like this one — no paywalls, no reseller scum, no "premium tier".
 
-What your coins buy:
-
-- more payloads reversed and released
-- more loaders replaced with open launchers
-- better decompiled references
-- tooling that makes the next one faster
-
-If this saved you money, send something back. If you're broke, use it anyway and
-share it with someone else who's broke. That's the whole point. If you're a
-reseller selling this exact tree back to kids at 20 bucks a month — you are the
-reason this exists, and you can go fuck yourself sideways.
+If this saved you money, send something back. If you are broke, use it anyway and
+hand it to someone else who is broke. That is the whole point. And if you are a
+reseller selling this exact tree back to kids at twenty bucks a month — you are
+the reason this exists, and you can go fuck yourself sideways.
 
 ## Contributing
 
-Pull requests welcome. Before opening one:
+Pull requests welcome. Before you open one:
 
 ```powershell
 pwsh -File build.ps1 -NoPayload
@@ -237,20 +332,22 @@ pwsh -File tools\check-clean.ps1   # must print "clean"
 
 `check-clean.ps1` blocks absolute user paths, config libraries and captured
 credentials. CI runs the same check plus a PowerShell parse pass. If your PR
-turns the badge red, you didn't read this paragraph, and you deserve the shame.
+turns the badge red, you did not read this paragraph, and you deserve the shame.
 
 ## No licence
 
 There is no licence file. Do whatever you want with the code in this repository:
-fork it, rewrite it, ship it, sell it, claim you wrote it — I genuinely do not
-care, and I am not going to pretend to be a lawyer about a cheat. The internal
-image (`payload.clean.dll`) is third-party software and is not mine to license
-either way; it ships in this repo so nobody has to beg for a download link.
+fork it, rewrite it, ship it, sell it, claim you wrote it — I do not care, and I
+am not going to play lawyer about a cheat. The internal image
+(`payload.clean.dll`) is third-party software and is not mine to license either
+way; it ships in this repo so nobody has to beg for a download link. The
+decompiled reference is a derived work of that binary, not a copy of any source.
 
 ## Final word
 
 The vendor charges a subscription to flip six booleans in a binary you already
-downloaded, and then calls that a product. Fuck that, and fuck every reseller
-who gatekeeps a file that costs them nothing to copy. The binary is in the tree.
-The patches are in `tools\gates.json`. The docs are in `docs\`. Compile it, play
-it, hand it to the next broke bastard who just wants to play the game.
+downloaded, then calls it a product. Fuck that, and fuck every reseller who
+gatekeeps a file that costs him nothing to copy. The binary is in the tree, the
+patches are in `tools\gates.json`, the approximate source is in `decompiled\`,
+and every address is written down in `docs\`. Compile it, read it, break it, fix
+it — that is what a repo is for.

@@ -1,0 +1,29 @@
+// FUN_180661180 - decompiled reference (Ghidra). Not original source, does not compile.
+
+/* 180661180 */
+
+void FUN_180661180(void)
+
+{
+  FUN_1801409d0(&DAT_180cc8060,DAT_180cc8058);
+  FUN_1801409d0(&DAT_180cc8050,DAT_180cc8048);
+  FUN_18015c010(&DAT_180cc8020);
+  FUN_18015c010(&DAT_180cc8000);
+  FUN_18015c010(&DAT_180cc7fb8);
+  FUN_18015c010(&DAT_180cc7f98);
+  FUN_1800c9840(&DAT_180cc7670);
+  FUN_1800c97e0(&DAT_180cb3590);
+  FUN_18015c010(&DAT_180cb3568);
+  FUN_18015c010(&DAT_180cb3548);
+  FUN_1800c8eb0(&DAT_180cb31a8);
+  FUN_1800c8eb0(&DAT_180cb2e28);
+  FUN_1800c9140(&DAT_180cb2b28);
+  FUN_1800c90a0(&DAT_180cb00f8);
+  _eh_vector_destructor_iterator_(&DAT_180cadd58,0xbe0,3,FUN_1800c8be0);
+  FUN_18015c010(&DAT_180cadd20);
+  FUN_18015c010(&DAT_180cadd00);
+  return;
+}
+
+
+

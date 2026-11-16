@@ -1,0 +1,32 @@
+// FUN_180615710 - decompiled reference (Ghidra). Not original source, does not compile.
+
+/* 180615710 */
+
+float FUN_180615710(float param_1,float *param_2)
+
+{
+  float fVar1;
+  uint uVar2;
+  
+  uVar2 = (uint)param_1 >> 0x17 & 0xff;
+  if (uVar2 < 0x7f) {
+    *param_2 = (float)((uint)param_1 & 0x80000000);
+    return param_1;
+  }
+  if (0x95 < uVar2) {
+    *param_2 = param_1;
+    if ((uint)ABS(param_1) < 0x7f800001) {
+      return (float)((uint)param_1 & 0x80000000);
+    }
+    return param_1 + param_1;
+  }
+  fVar1 = (float)(-1 << (0x96U - (char)((uint)param_1 >> 0x17) & 0x1f) & (uint)param_1);
+  *param_2 = fVar1;
+  if ((param_1 == fVar1) && (param_1 < 0.0)) {
+    return -0.0;
+  }
+  return param_1 - fVar1;
+}
+
+
+

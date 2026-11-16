@@ -37,13 +37,20 @@ binary it came from.
 
 ## Where to get it
 
-`decompiled-reference.zip` is published as a release asset, not committed here:
-38 MB of generated text would bloat every clone and churn on every regeneration.
+It is committed in this repository, split one file per function, so a clone has
+it and GitHub can actually render it:
 
 ```
-Releases -> decompiled-reference.zip
-  decompiled.c          every function, Ghidra output
-  README.txt            this disclaimer, plain text
+decompiled\
+  00\  ..  06\     RVA buckets, one FUN_<address>.c per function
+  README.md        what it is, how to grep it, how to regenerate
+```
+
+The single 32 MB `decompiled.c` that Ghidra writes is not committed — it is
+regenerated on demand and split by `tools\split_decomp.ps1`:
+
+```powershell
+pwsh -File tools\split_decomp.ps1 -In decompiled.c -Out decompiled
 ```
 
 ## How to regenerate it yourself

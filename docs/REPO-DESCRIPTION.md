@@ -9,13 +9,13 @@ server, no bullshit. Free forever. Build it your fucking self, play, pass it to
 broke bastards. Donations fund cracking more of these scumbags.
 ```
 
-## One-liner (for release titles / Discord)
+## One-liner (for the repo page / Discord)
 
 ```
-HVHGOD SLUTS — the HVHGOD internal cracked, local launcher included, free forever, no vendor server. Fuck the subscription.
+HVHGOD SLUTS — the HVHGOD internal cracked, the binary and the approximate source in the repo, local launcher included, free forever, no vendor server. Fuck the subscription.
 ```
 
-## Long description (for the repo page or a release body)
+## Long description (for the repo page)
 
 ```
 HVHGOD sells you a subscription to flip six booleans in a binary that already
@@ -23,7 +23,8 @@ lives on your own disk. This is that binary, cracked, with the launcher rebuilt
 from scratch so it never talks to their server again.
 
 What you get:
-  - the original HVHGOD internal image, licence gates torn out (35 bytes)
+  - the original HVHGOD internal image, licence gates torn out (35 bytes), committed
+  - 11,150 decompiled functions, one file per function, for reading and patching
   - a local launcher, in this repo, source included
   - a manual PE mapper, an import repair tool, an entry caller, a progress overlay
   - the whole pipeline: launch through Steam, map, attach, verify

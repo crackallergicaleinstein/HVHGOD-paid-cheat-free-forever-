@@ -1,0 +1,19 @@
+// FUN_180660bc4 - decompiled reference (Ghidra). Not original source, does not compile.
+
+/* 180660bc4 */
+
+void FUN_180660bc4(void)
+
+{
+  longlong lVar1;
+  
+  lVar1 = FUN_180606ee8();
+  if (0 < *(int *)(lVar1 + 0x30)) {
+    lVar1 = FUN_180606ee8();
+    *(int *)(lVar1 + 0x30) = *(int *)(lVar1 + 0x30) + -1;
+  }
+  return;
+}
+
+
+

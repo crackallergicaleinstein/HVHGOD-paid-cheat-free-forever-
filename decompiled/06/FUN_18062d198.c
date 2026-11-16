@@ -1,0 +1,59 @@
+// FUN_18062d198 - decompiled reference (Ghidra). Not original source, does not compile.
+
+/* 18062d198 */
+
+undefined4 FUN_18062d198(void)
+
+{
+  undefined4 uVar1;
+  longlong lVar2;
+  undefined4 *in_stack_00000030;
+  longlong local_48 [2];
+  undefined1 local_38;
+  undefined4 local_30;
+  undefined4 uStack_2c;
+  undefined4 uStack_28;
+  undefined4 uStack_24;
+  char local_20;
+  undefined4 local_1c;
+  char local_18;
+  undefined4 local_14;
+  char local_10;
+  
+  local_48[0] = 0;
+  local_38 = 0;
+  local_20 = '\0';
+  local_18 = '\0';
+  local_10 = '\0';
+  if (in_stack_00000030 == (undefined4 *)0x0) {
+    if (DAT_180bb2030 != 0) goto LAB_18062d1e6;
+    local_30 = PTR_PTR_1808d7448._0_4_;
+    uStack_2c = PTR_PTR_1808d7448._4_4_;
+    uStack_28 = PTR_DAT_1808d7450._0_4_;
+    uStack_24 = PTR_DAT_1808d7450._4_4_;
+  }
+  else {
+    local_30 = *in_stack_00000030;
+    uStack_2c = in_stack_00000030[1];
+    uStack_28 = in_stack_00000030[2];
+    uStack_24 = in_stack_00000030[3];
+  }
+  local_20 = '\x01';
+LAB_18062d1e6:
+  uVar1 = FUN_18062cd44();
+  if (local_20 == '\x02') {
+    *(uint *)(local_48[0] + 0x3a8) = *(uint *)(local_48[0] + 0x3a8) & 0xfffffffd;
+  }
+  if (local_18 != '\0') {
+    lVar2 = FUN_18060a6e8(local_48);
+    *(undefined4 *)(lVar2 + 0x20) = local_1c;
+  }
+  if (local_10 != '\0') {
+    lVar2 = FUN_18060a6e8(local_48);
+    *(undefined4 *)(lVar2 + 0x24) = local_14;
+  }
+  return uVar1;
+}
+
+
+

@@ -1,0 +1,144 @@
+// FUN_1803aae70 - decompiled reference (Ghidra). Not original source, does not compile.
+
+/* 1803aae70 */
+
+void FUN_1803aae70(longlong *param_1,longlong *param_2)
+
+{
+  if (*param_2 == 0) {
+    FUN_18063ab10(param_1,0,0x400);
+    return;
+  }
+  *param_1 = *param_2;
+  param_1[1] = *param_2;
+  param_1[2] = *param_2;
+  param_1[3] = *param_2;
+  param_1[4] = *param_2;
+  param_1[5] = *param_2;
+  param_1[6] = *param_2;
+  param_1[7] = *param_2;
+  param_1[8] = *param_2;
+  param_1[9] = *param_2;
+  param_1[10] = *param_2;
+  param_1[0xb] = *param_2;
+  param_1[0xc] = *param_2;
+  param_1[0xd] = *param_2;
+  param_1[0xe] = *param_2;
+  param_1[0xf] = *param_2;
+  param_1[0x10] = *param_2;
+  param_1[0x11] = *param_2;
+  param_1[0x12] = *param_2;
+  param_1[0x13] = *param_2;
+  param_1[0x14] = *param_2;
+  param_1[0x15] = *param_2;
+  param_1[0x16] = *param_2;
+  param_1[0x17] = *param_2;
+  param_1[0x18] = *param_2;
+  param_1[0x19] = *param_2;
+  param_1[0x1a] = *param_2;
+  param_1[0x1b] = *param_2;
+  param_1[0x1c] = *param_2;
+  param_1[0x1d] = *param_2;
+  param_1[0x1e] = *param_2;
+  param_1[0x1f] = *param_2;
+  param_1[0x20] = *param_2;
+  param_1[0x21] = *param_2;
+  param_1[0x22] = *param_2;
+  param_1[0x23] = *param_2;
+  param_1[0x24] = *param_2;
+  param_1[0x25] = *param_2;
+  param_1[0x26] = *param_2;
+  param_1[0x27] = *param_2;
+  param_1[0x28] = *param_2;
+  param_1[0x29] = *param_2;
+  param_1[0x2a] = *param_2;
+  param_1[0x2b] = *param_2;
+  param_1[0x2c] = *param_2;
+  param_1[0x2d] = *param_2;
+  param_1[0x2e] = *param_2;
+  param_1[0x2f] = *param_2;
+  param_1[0x30] = *param_2;
+  param_1[0x31] = *param_2;
+  param_1[0x32] = *param_2;
+  param_1[0x33] = *param_2;
+  param_1[0x34] = *param_2;
+  param_1[0x35] = *param_2;
+  param_1[0x36] = *param_2;
+  param_1[0x37] = *param_2;
+  param_1[0x38] = *param_2;
+  param_1[0x39] = *param_2;
+  param_1[0x3a] = *param_2;
+  param_1[0x3b] = *param_2;
+  param_1[0x3c] = *param_2;
+  param_1[0x3d] = *param_2;
+  param_1[0x3e] = *param_2;
+  param_1[0x3f] = *param_2;
+  param_1[0x40] = *param_2;
+  param_1[0x41] = *param_2;
+  param_1[0x42] = *param_2;
+  param_1[0x43] = *param_2;
+  param_1[0x44] = *param_2;
+  param_1[0x45] = *param_2;
+  param_1[0x46] = *param_2;
+  param_1[0x47] = *param_2;
+  param_1[0x48] = *param_2;
+  param_1[0x49] = *param_2;
+  param_1[0x4a] = *param_2;
+  param_1[0x4b] = *param_2;
+  param_1[0x4c] = *param_2;
+  param_1[0x4d] = *param_2;
+  param_1[0x4e] = *param_2;
+  param_1[0x4f] = *param_2;
+  param_1[0x50] = *param_2;
+  param_1[0x51] = *param_2;
+  param_1[0x52] = *param_2;
+  param_1[0x53] = *param_2;
+  param_1[0x54] = *param_2;
+  param_1[0x55] = *param_2;
+  param_1[0x56] = *param_2;
+  param_1[0x57] = *param_2;
+  param_1[0x58] = *param_2;
+  param_1[0x59] = *param_2;
+  param_1[0x5a] = *param_2;
+  param_1[0x5b] = *param_2;
+  param_1[0x5c] = *param_2;
+  param_1[0x5d] = *param_2;
+  param_1[0x5e] = *param_2;
+  param_1[0x5f] = *param_2;
+  param_1[0x60] = *param_2;
+  param_1[0x61] = *param_2;
+  param_1[0x62] = *param_2;
+  param_1[99] = *param_2;
+  param_1[100] = *param_2;
+  param_1[0x65] = *param_2;
+  param_1[0x66] = *param_2;
+  param_1[0x67] = *param_2;
+  param_1[0x68] = *param_2;
+  param_1[0x69] = *param_2;
+  param_1[0x6a] = *param_2;
+  param_1[0x6b] = *param_2;
+  param_1[0x6c] = *param_2;
+  param_1[0x6d] = *param_2;
+  param_1[0x6e] = *param_2;
+  param_1[0x6f] = *param_2;
+  param_1[0x70] = *param_2;
+  param_1[0x71] = *param_2;
+  param_1[0x72] = *param_2;
+  param_1[0x73] = *param_2;
+  param_1[0x74] = *param_2;
+  param_1[0x75] = *param_2;
+  param_1[0x76] = *param_2;
+  param_1[0x77] = *param_2;
+  param_1[0x78] = *param_2;
+  param_1[0x79] = *param_2;
+  param_1[0x7a] = *param_2;
+  param_1[0x7b] = *param_2;
+  param_1[0x7c] = *param_2;
+  param_1[0x7d] = *param_2;
+  param_1[0x7e] = *param_2;
+  param_1[0x7f] = *param_2;
+  return;
+}
+
+
+

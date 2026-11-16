@@ -1,0 +1,15 @@
+// FUN_1805fa600 - decompiled reference (Ghidra). Not original source, does not compile.
+
+/* 1805fa600 */
+
+undefined8 * FUN_1805fa600(undefined8 *param_1)
+
+{
+  param_1[2] = 0;
+  param_1[1] = "bad allocation";
+  *param_1 = std::bad_alloc::vftable;
+  return param_1;
+}
+
+
+

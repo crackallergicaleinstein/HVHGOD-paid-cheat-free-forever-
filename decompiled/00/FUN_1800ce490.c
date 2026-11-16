@@ -1,0 +1,193 @@
+// FUN_1800ce490 - decompiled reference (Ghidra). Not original source, does not compile.
+
+/* 1800ce490 */
+
+/* WARNING: Function: _guard_dispatch_icall replaced with injection: guard_dispatch_icall */
+/* WARNING: Function: __security_check_cookie replaced with injection: security_check_cookie */
+
+void FUN_1800ce490(longlong param_1,undefined8 param_2)
+
+{
+  short sVar1;
+  int iVar2;
+  undefined8 uVar3;
+  undefined1 (*pauVar4) [16];
+  undefined1 auStack_318 [32];
+  undefined1 *local_2f8;
+  undefined8 *local_2f0;
+  undefined1 local_2e8 [16];
+  undefined4 local_2d8;
+  undefined1 local_2d0 [16];
+  undefined8 local_2c0;
+  undefined1 local_2b8 [16];
+  undefined8 local_2a8;
+  undefined1 local_2a0 [24];
+  undefined1 local_288 [16];
+  undefined8 local_278;
+  undefined1 local_270 [24];
+  undefined1 local_258 [16];
+  undefined8 local_248;
+  undefined1 local_240 [24];
+  undefined1 local_228 [16];
+  undefined8 local_218;
+  undefined1 local_210 [24];
+  undefined1 local_1f8 [16];
+  undefined8 local_1e8;
+  undefined1 local_1e0 [8];
+  char *local_1d8;
+  undefined8 local_1d0;
+  undefined1 local_1c8 [16];
+  undefined8 local_1b8;
+  undefined1 local_1b0 [16];
+  undefined8 local_1a0;
+  undefined1 local_198 [16];
+  undefined8 local_188;
+  undefined1 local_180 [16];
+  undefined8 local_170;
+  undefined8 local_168;
+  undefined1 local_160 [24];
+  undefined1 local_148 [16];
+  undefined8 local_138;
+  undefined1 local_130 [24];
+  undefined1 local_118 [16];
+  undefined8 local_108;
+  undefined1 local_100 [24];
+  undefined1 local_e8 [16];
+  undefined8 local_d8;
+  undefined1 local_d0 [8];
+  undefined1 local_c8 [16];
+  undefined8 local_b8;
+  undefined1 local_b0 [16];
+  undefined8 local_a0;
+  undefined1 local_98 [16];
+  undefined8 local_88;
+  undefined1 local_80 [16];
+  undefined8 local_70;
+  undefined1 local_68 [32];
+  undefined1 local_48 [32];
+  undefined1 local_28 [8];
+  ulonglong local_20;
+  
+  local_20 = DAT_1808d5f00 ^ (ulonglong)auStack_318;
+  local_2d8 = 0;
+  local_168 = param_2;
+  FUN_1800e60e0(local_210,&DAT_1806be004);
+  local_1f8 = ZEXT816(0);
+  sVar1 = *(short *)(param_1 + 0x10);
+  FUN_1801409d0(local_1f8 + 8,0);
+  local_1f8[0] = 5;
+  local_1f8._8_8_ = (longlong)sVar1;
+  local_1e8 = 0;
+  local_2f8 = local_210;
+  local_2f0 = (undefined8 *)local_1e0;
+  FUN_1800f4e90(local_c8,&local_2f8,1,2);
+  local_b8 = 0;
+  FUN_1800e60e0(local_240,&DAT_1806bdfcc);
+  local_228 = ZEXT816(0);
+  sVar1 = *(short *)(param_1 + 0x12);
+  FUN_1801409d0(local_228 + 8,0);
+  local_228[0] = 5;
+  local_228._8_8_ = (longlong)sVar1;
+  local_218 = 0;
+  local_2f8 = local_240;
+  local_2f0 = (undefined8 *)local_210;
+  FUN_1800f4e90(local_b0,&local_2f8,1,2);
+  local_a0 = 0;
+  FUN_1800e60e0(local_160,"custom_agents");
+  FUN_1800e60e0(local_100,&DAT_1806bdfcc);
+  uVar3 = FUN_1800ce230(param_1,local_48,2);
+  FUN_1800e6ec0(local_e8,uVar3);
+  local_d8 = 0;
+  local_2f8 = local_100;
+  local_2f0 = (undefined8 *)local_d0;
+  FUN_1800f4e90(local_198,&local_2f8,1,2);
+  local_188 = 0;
+  FUN_1800e60e0(local_130,&DAT_1806be004);
+  uVar3 = FUN_1800ce230(param_1,local_68,3);
+  FUN_1800e6ec0(local_118,uVar3);
+  local_108 = 0;
+  local_2f8 = local_130;
+  local_2f0 = (undefined8 *)local_100;
+  FUN_1800f4e90(local_180,&local_2f8,1,2);
+  local_170 = 0;
+  local_2f8 = local_198;
+  local_2f0 = &local_168;
+  FUN_1800f4e90(local_148,&local_2f8,1,2);
+  local_138 = 0;
+  local_2f8 = local_160;
+  local_2f0 = (undefined8 *)local_130;
+  FUN_1800f4e90(local_98,&local_2f8,1,2);
+  local_88 = 0;
+  local_2f8 = local_2d0;
+  local_2d0 = ZEXT816(0);
+  FUN_1801409d0(local_2d0 + 8,0);
+  local_2d0[0] = 3;
+  local_2e8 = (undefined1  [16])0x0;
+  if (DAT_180c7df28 == (undefined8 *)0x0) {
+    local_1d8 = "tier0.dll:g_pMemAlloc";
+    local_1d0 = 0x15;
+    DAT_180c7df28 = (undefined8 *)FUN_180451750(&local_1d8);
+  }
+  pauVar4 = (undefined1 (*) [16])
+            (**(code **)(*(longlong *)*DAT_180c7df28 + 8))((longlong *)*DAT_180c7df28,0x20);
+  local_2e8._0_8_ = local_28;
+  *pauVar4 = (undefined1  [16])0x0;
+  *(undefined8 *)pauVar4[1] = 0;
+  *(undefined8 *)(pauVar4[1] + 8) = 0;
+  local_2e8._8_8_ = pauVar4;
+  FUN_18015ba30(pauVar4,"custom_model_options",0x14);
+  local_2d0._8_8_ = pauVar4;
+  local_2c0 = 0;
+  FUN_1800e60e0(local_270,"cloth_motion");
+  iVar2 = *(int *)(param_1 + 0x60);
+  local_258 = ZEXT816(0);
+  FUN_1801409d0(local_258 + 8,0);
+  local_258[0] = 5;
+  local_258[8] = iVar2 == 1;
+  local_258._9_7_ = 0;
+  local_248 = 0;
+  local_2e8._0_8_ = local_270;
+  local_2e8._8_8_ = local_240;
+  FUN_1800f4e90(local_1c8,local_2e8,1,2);
+  local_1b8 = 0;
+  FUN_1800e60e0(local_2a0,"hands_mode");
+  iVar2 = *(int *)(param_1 + 100);
+  local_288 = ZEXT816(0);
+  FUN_1801409d0(local_288 + 8,0);
+  local_288[0] = 5;
+  local_288[8] = iVar2 == 1;
+  local_288._9_7_ = 0;
+  local_278 = 0;
+  local_2e8._0_8_ = local_2a0;
+  local_2e8._8_8_ = local_270;
+  FUN_1800f4e90(local_1b0,local_2e8,1,2);
+  local_1a0 = 0;
+  local_2e8._0_8_ = local_1c8;
+  local_2e8._8_8_ = local_198;
+  FUN_1800f4e90(local_2b8,local_2e8,1,2);
+  local_2a8 = 0;
+  local_2e8._0_8_ = local_2d0;
+  local_2e8._8_8_ = local_2a0;
+  FUN_1800f4e90(local_80,local_2e8,1,2);
+  local_70 = 0;
+  local_2e8._8_8_ = local_68;
+  local_2e8._0_8_ = local_c8;
+  FUN_1800f4e90(param_2,local_2e8,1,2);
+  local_2d8 = 1;
+  _eh_vector_destructor_iterator_(local_c8,0x18,4,FUN_1800aab30);
+  _eh_vector_destructor_iterator_(local_2d0,0x18,2,FUN_1800aab30);
+  _eh_vector_destructor_iterator_(local_1c8,0x18,2,FUN_1800aab30);
+  _eh_vector_destructor_iterator_(local_2a0,0x18,2,FUN_1800aab30);
+  _eh_vector_destructor_iterator_(local_270,0x18,2,FUN_1800aab30);
+  _eh_vector_destructor_iterator_(local_160,0x18,2,FUN_1800aab30);
+  _eh_vector_destructor_iterator_(local_198,0x18,2,FUN_1800aab30);
+  _eh_vector_destructor_iterator_(local_130,0x18,2,FUN_1800aab30);
+  FUN_18015c010(local_68);
+  _eh_vector_destructor_iterator_(local_100,0x18,2,FUN_1800aab30);
+  FUN_18015c010(local_48);
+  _eh_vector_destructor_iterator_(local_240,0x18,2,FUN_1800aab30);
+  _eh_vector_destructor_iterator_(local_210,0x18,2,FUN_1800aab30);
+}
+
+
+

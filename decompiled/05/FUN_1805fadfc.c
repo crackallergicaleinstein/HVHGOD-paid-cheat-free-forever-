@@ -1,0 +1,36 @@
+// FUN_1805fadfc - decompiled reference (Ghidra). Not original source, does not compile.
+
+/* 1805fadfc */
+
+DWORD FUN_1805fadfc(HANDLE param_1)
+
+{
+  BOOL BVar1;
+  DWORD DVar2;
+  undefined1 local_res10 [8];
+  undefined4 local_res18 [4];
+  
+  local_res18[0] = 3;
+  BVar1 = SetFileInformationByHandle(param_1,0x15,local_res18,4);
+  if (BVar1 == 0) {
+    DVar2 = GetLastError();
+    if (DVar2 != 1) {
+      if (DVar2 == 5) {
+        return 5;
+      }
+      if ((DVar2 != 0x32) && (DVar2 != 0x57)) {
+        return DVar2;
+      }
+    }
+    local_res10[0] = 1;
+    BVar1 = SetFileInformationByHandle(param_1,FileDispositionInfo,local_res10,1);
+    if (BVar1 == 0) {
+      DVar2 = GetLastError();
+      return DVar2;
+    }
+  }
+  return 0;
+}
+
+
+

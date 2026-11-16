@@ -1,0 +1,36 @@
+// FUN_1805c8290 - decompiled reference (Ghidra). Not original source, does not compile.
+
+/* 1805c8290 */
+
+undefined8 FUN_1805c8290(longlong param_1,longlong param_2)
+
+{
+  byte bVar1;
+  longlong lVar2;
+  byte *pbVar3;
+  uint uVar4;
+  
+  if (*(ulonglong *)(param_2 + 0x108) < param_1 + 4U) {
+    FUN_18057bd80(param_2,8);
+  }
+  uVar4 = (uint)CONCAT11(*(undefined1 *)(param_1 + 2),*(undefined1 *)(param_1 + 3));
+  if ((*(ulonglong *)(param_2 + 0x108) < param_1 + (ulonglong)uVar4) || (uVar4 < 0x106)) {
+    FUN_18057bd80(param_2,8);
+  }
+  if (0 < *(int *)(param_2 + 0x110)) {
+    pbVar3 = (byte *)(param_1 + 6);
+    lVar2 = 0x100;
+    do {
+      bVar1 = *pbVar3;
+      pbVar3 = pbVar3 + 1;
+      if (*(uint *)(param_2 + 0x120) <= (uint)bVar1) {
+        FUN_18057bd80(param_2,0x10);
+      }
+      lVar2 = lVar2 + -1;
+    } while (lVar2 != 0);
+  }
+  return 0;
+}
+
+
+

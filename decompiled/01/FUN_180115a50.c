@@ -1,0 +1,135 @@
+// FUN_180115a50 - decompiled reference (Ghidra). Not original source, does not compile.
+
+/* 180115a50 */
+
+void FUN_180115a50(longlong param_1)
+
+{
+  undefined1 auVar1 [16];
+  undefined1 auVar2 [16];
+  uint7 uStack_10f;
+  undefined8 local_f8;
+  longlong lStack_f0;
+  undefined8 local_e8;
+  undefined1 local_d8 [16];
+  undefined8 local_c8;
+  undefined8 local_c0;
+  undefined1 local_b8 [16];
+  undefined8 local_a8;
+  undefined8 local_a0;
+  undefined1 local_98 [16];
+  undefined8 local_88;
+  undefined8 local_80;
+  undefined1 local_78 [16];
+  undefined8 local_68;
+  undefined8 local_60;
+  undefined1 local_58 [16];
+  undefined8 local_48;
+  undefined8 local_40;
+  undefined1 local_38 [16];
+  undefined8 local_28;
+  undefined8 local_20;
+  
+  local_c8 = 0;
+  local_c0 = 0xf;
+  local_d8._1_15_ = SUB1615((undefined1  [16])0x0,1);
+  auVar1[0xf] = 0;
+  auVar1._0_15_ = local_d8._1_15_;
+  local_d8 = auVar1 << 8;
+  local_a8 = 0;
+  local_a0 = 0xf;
+  local_b8._1_15_ = SUB1615((undefined1  [16])0x0,1);
+  auVar2[0xf] = 0;
+  auVar2._0_15_ = local_b8._1_15_;
+  local_b8 = auVar2 << 8;
+  lStack_f0 = (ulonglong)uStack_10f << 8;
+  local_f8 = 0;
+  local_e8 = 0;
+  FUN_18015a8b0(0,0,&local_f8,local_b8,local_d8,0);
+  local_98 = (undefined1  [16])0x0;
+  local_88 = 0;
+  local_80 = 0;
+  FUN_18015ba30(local_98,"chams",5);
+  local_78 = (undefined1  [16])0x0;
+  local_68 = 0;
+  local_60 = 0;
+  FUN_18015ba30(local_78,"chams layer",0xb);
+  lStack_f0 = (ulonglong)uStack_10f << 8;
+  local_f8 = 0;
+  local_e8 = 0;
+  FUN_18015a8b0(param_1 + 0x68,0,&local_f8,local_78,local_98,0);
+  *(undefined8 *)(param_1 + 0xd0) = 0xffffffffffffffff;
+  *(undefined1 *)(param_1 + 0xd8) = 0;
+  *(undefined4 *)(param_1 + 0xdc) = 0;
+  *(undefined1 *)(param_1 + 0xe0) = 2;
+  *(undefined4 *)(param_1 + 0xe4) = 0xffffffff;
+  *(undefined4 *)(param_1 + 0xe8) = 0;
+  *(undefined4 *)(param_1 + 0xec) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0xf0) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0xf8) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0xfc) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0x104) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0x108) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0x110) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0x114) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0x11c) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0x120) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0x128) = 0x3f800000;
+  *(undefined8 *)(param_1 + 300) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0x134) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0x138) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0x140) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0x144) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0x14c) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0x150) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0x158) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0x15c) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0x164) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0x168) = 0x3e800000;
+  local_58 = (undefined1  [16])0x0;
+  local_48 = 0;
+  local_40 = 0;
+  FUN_18015ba30(local_58,"chams",5);
+  local_38 = (undefined1  [16])0x0;
+  local_28 = 0;
+  local_20 = 0;
+  FUN_18015ba30(local_38,"chams layer",0xb);
+  lStack_f0 = (ulonglong)uStack_10f << 8;
+  local_f8 = 0;
+  local_e8 = 0;
+  FUN_18015a8b0(param_1 + 0x170,0,&local_f8,local_38,local_58,0);
+  *(undefined8 *)(param_1 + 0x1d8) = 0xffffffffffffffff;
+  *(undefined1 *)(param_1 + 0x1e0) = 0;
+  *(undefined4 *)(param_1 + 0x1e4) = 0;
+  *(undefined1 *)(param_1 + 0x1e8) = 2;
+  *(undefined4 *)(param_1 + 0x1ec) = 0xffffffff;
+  *(undefined4 *)(param_1 + 0x1f0) = 0;
+  *(undefined4 *)(param_1 + 500) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0x1f8) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0x200) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0x204) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0x20c) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0x210) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0x218) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0x21c) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0x224) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0x228) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0x230) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0x234) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0x23c) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0x240) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0x248) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0x24c) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0x254) = 0x3f800000;
+  *(undefined8 *)(param_1 + 600) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0x260) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0x264) = 0x3e800000;
+  *(undefined4 *)(param_1 + 0x26c) = 0x3f800000;
+  *(undefined8 *)(param_1 + 0x270) = 0x3e800000;
+  *(undefined8 *)(param_1 + 0x278) = 0;
+  *(undefined4 *)(param_1 + 0x280) = 0x42c80000;
+  return;
+}
+
+
+

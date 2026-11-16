@@ -1,0 +1,18 @@
+// FUN_1805f5928 - decompiled reference (Ghidra). Not original source, does not compile.
+
+/* 1805f5928 */
+
+NTSTATUS __stdcall
+BCryptGenRandom(BCRYPT_ALG_HANDLE hAlgorithm,PUCHAR pbBuffer,ULONG cbBuffer,ULONG dwFlags)
+
+{
+  NTSTATUS NVar1;
+  
+                    /* WARNING: Could not recover jumptable at 0x0001805f5928. Too many branches */
+                    /* WARNING: Treating indirect jump as call */
+  NVar1 = BCryptGenRandom(hAlgorithm,pbBuffer,cbBuffer,dwFlags);
+  return NVar1;
+}
+
+
+

@@ -1,0 +1,64 @@
+// FUN_1801543a0 - decompiled reference (Ghidra). Not original source, does not compile.
+
+/* 1801543a0 */
+
+void FUN_1801543a0(longlong *param_1,undefined8 *param_2)
+
+{
+  ulonglong uVar1;
+  undefined8 *puVar2;
+  longlong lVar3;
+  ulonglong uVar4;
+  undefined8 *puVar5;
+  ulonglong uVar6;
+  longlong lVar7;
+  longlong lVar8;
+  
+  puVar5 = (undefined8 *)param_1[1];
+  if (puVar5 == (undefined8 *)param_1[2]) {
+    lVar7 = (longlong)puVar5 - *param_1 >> 3;
+    if (lVar7 == 0x1fffffffffffffff) {
+                    /* WARNING: Subroutine does not return */
+      FUN_1801136f0();
+    }
+    uVar1 = lVar7 + 1;
+    uVar4 = param_1[2] - *param_1 >> 3;
+    if (0x1fffffffffffffff - (uVar4 >> 1) < uVar4) {
+      uVar6 = 0x1fffffffffffffff;
+    }
+    else {
+      uVar4 = (uVar4 >> 1) + uVar4;
+      uVar6 = uVar1;
+      if (uVar1 <= uVar4) {
+        uVar6 = uVar4;
+      }
+      if (0x1fffffffffffffff < uVar6) {
+                    /* WARNING: Subroutine does not return */
+        FUN_18015bc80();
+      }
+    }
+    lVar3 = FUN_18015bca0(uVar6 * 8);
+    *(undefined8 *)(lVar3 + lVar7 * 8) = *param_2;
+    puVar2 = (undefined8 *)*param_1;
+    if (puVar5 == (undefined8 *)param_1[1]) {
+      lVar8 = param_1[1] - (longlong)puVar2;
+      lVar7 = lVar3;
+      puVar5 = puVar2;
+    }
+    else {
+      FUN_18063aed0(lVar3,puVar2,(longlong)puVar5 - (longlong)puVar2);
+      lVar8 = param_1[1] - (longlong)puVar5;
+      lVar7 = lVar3 + (lVar7 + 1) * 8;
+    }
+    FUN_18063aed0(lVar7,puVar5,lVar8);
+    FUN_180158b60(param_1,lVar3,uVar1,uVar6);
+  }
+  else {
+    *puVar5 = *param_2;
+    param_1[1] = param_1[1] + 8;
+  }
+  return;
+}
+
+
+

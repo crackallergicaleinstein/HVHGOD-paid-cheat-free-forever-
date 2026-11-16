@@ -1,0 +1,20 @@
+// FUN_1805f5cf8 - decompiled reference (Ghidra). Not original source, does not compile.
+
+/* 1805f5cf8 */
+
+/* Library Function - Single Match
+    atexit
+   
+   Library: Visual Studio 2019 Release */
+
+int __cdecl atexit(_func_5014 *param_1)
+
+{
+  _onexit_t p_Var1;
+  
+  p_Var1 = _onexit((_onexit_t)param_1);
+  return (p_Var1 != (_onexit_t)0x0) - 1;
+}
+
+
+

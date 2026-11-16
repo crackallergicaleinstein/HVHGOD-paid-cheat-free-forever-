@@ -1,0 +1,133 @@
+// FUN_1800cae50 - decompiled reference (Ghidra). Not original source, does not compile.
+
+/* 1800cae50 */
+
+undefined8 FUN_1800cae50(int *param_1,undefined8 param_2)
+
+{
+  int iVar1;
+  undefined1 auVar2 [16];
+  float fVar3;
+  undefined7 uStackX_9;
+  undefined1 *local_1f8;
+  undefined1 *local_1f0;
+  undefined4 local_1e8;
+  undefined1 local_1e0 [24];
+  undefined1 local_1c8 [16];
+  undefined8 local_1b8;
+  undefined1 local_1b0 [24];
+  undefined1 local_198 [16];
+  undefined8 local_188;
+  undefined1 local_180 [24];
+  undefined1 local_168 [16];
+  undefined8 local_158;
+  undefined1 local_150 [24];
+  undefined1 local_138 [16];
+  undefined8 local_128;
+  undefined1 local_120 [24];
+  undefined1 local_108 [16];
+  undefined8 local_f8;
+  undefined1 local_f0 [24];
+  undefined1 local_d8 [16];
+  undefined8 local_c8;
+  undefined1 local_c0 [8];
+  undefined1 local_b8 [16];
+  undefined8 local_a8;
+  undefined1 local_a0 [16];
+  undefined8 local_90;
+  undefined1 local_88 [16];
+  undefined8 local_78;
+  undefined1 local_70 [16];
+  undefined8 local_60;
+  undefined1 local_58 [16];
+  undefined8 local_48;
+  undefined1 local_40 [16];
+  undefined8 local_30;
+  undefined1 local_28 [16];
+  
+  local_1e8 = 0;
+  FUN_1800e60e0(local_f0,&DAT_1806bdf80);
+  local_d8 = ZEXT816(0);
+  iVar1 = *param_1;
+  FUN_1801409d0(local_d8 + 8,0);
+  local_d8[0] = 5;
+  local_d8._8_8_ = (longlong)iVar1;
+  local_c8 = 0;
+  local_1f8 = local_f0;
+  local_1f0 = local_c0;
+  FUN_1800f4e90(local_b8,&local_1f8,1,2);
+  local_a8 = 0;
+  FUN_1800e60e0(local_120,&DAT_1806bdfac);
+  local_108 = ZEXT816(0);
+  iVar1 = param_1[1];
+  FUN_1801409d0(local_108 + 8,0);
+  local_108[0] = 5;
+  local_108._8_8_ = (longlong)iVar1;
+  local_f8 = 0;
+  local_1f8 = local_120;
+  local_1f0 = local_f0;
+  FUN_1800f4e90(local_a0,&local_1f8,1,2);
+  local_90 = 0;
+  FUN_1800e60e0(local_150,&DAT_1806bdfa4);
+  local_138 = ZEXT816(0);
+  fVar3 = (float)param_1[2];
+  FUN_1801409d0(local_138 + 8,0);
+  local_138[0] = 7;
+  local_138._8_8_ = (double)fVar3;
+  local_128 = 0;
+  local_1f8 = local_150;
+  local_1f0 = local_120;
+  FUN_1800f4e90(local_88,&local_1f8,1,2);
+  local_78 = 0;
+  FUN_1800e60e0(local_180,&DAT_1806bdfa8);
+  local_168 = ZEXT816(0);
+  fVar3 = (float)param_1[3];
+  FUN_1801409d0(local_168 + 8,0);
+  local_168[0] = 7;
+  local_168._8_8_ = (double)fVar3;
+  local_158 = 0;
+  local_1f8 = local_180;
+  local_1f0 = local_150;
+  FUN_1800f4e90(local_70,&local_1f8,1,2);
+  local_60 = 0;
+  FUN_1800e60e0(local_1b0,&DAT_1806bdfb4);
+  local_198 = ZEXT816(0);
+  fVar3 = (float)param_1[4];
+  FUN_1801409d0(local_198 + 8,0);
+  local_198[0] = 7;
+  local_198._8_8_ = (double)fVar3;
+  local_188 = 0;
+  local_1f8 = local_1b0;
+  local_1f0 = local_180;
+  FUN_1800f4e90(local_58,&local_1f8,1,2);
+  local_48 = 0;
+  FUN_1800e60e0(local_1e0,"placed");
+  local_1c8 = ZEXT816(0);
+  iVar1 = param_1[5];
+  FUN_1801409d0(local_1c8 + 8,0);
+  local_1c8[0] = 4;
+  auVar2 = local_1c8;
+  local_1c8._9_7_ = uStackX_9;
+  local_1c8[8] = (char)iVar1;
+  local_1c8._0_8_ = auVar2._0_8_;
+  local_1b8 = 0;
+  local_1f8 = local_1e0;
+  local_1f0 = local_1b0;
+  FUN_1800f4e90(local_40,&local_1f8,1,2);
+  local_30 = 0;
+  local_1f8 = local_b8;
+  local_1f0 = local_28;
+  FUN_1800f4e90(param_2,&local_1f8,1,2);
+  local_1e8 = 1;
+  _eh_vector_destructor_iterator_(local_b8,0x18,6,FUN_1800aab30);
+  _eh_vector_destructor_iterator_(local_1e0,0x18,2,FUN_1800aab30);
+  _eh_vector_destructor_iterator_(local_1b0,0x18,2,FUN_1800aab30);
+  _eh_vector_destructor_iterator_(local_180,0x18,2,FUN_1800aab30);
+  _eh_vector_destructor_iterator_(local_150,0x18,2,FUN_1800aab30);
+  _eh_vector_destructor_iterator_(local_120,0x18,2,FUN_1800aab30);
+  _eh_vector_destructor_iterator_(local_f0,0x18,2,FUN_1800aab30);
+  return param_2;
+}
+
+
+

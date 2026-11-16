@@ -14,6 +14,7 @@ empty — Windows Explorer shows folders at the top level, so open them.
 | `work\run-standalone.ps1` | 14 KB | the pipeline: preflight, stage, launch, map, attach, verify |
 | `tools\strip_gates.ps1` | 5 KB | applies the six payload patches |
 | `tools\bytepatch.ps1` | 4 KB | applies arbitrary byte edits from a JSON list, with an expect-check |
+| `tools\split_decomp.ps1` | 2 KB | splits a Ghidra `decompiled.c` into the `decompiled\` tree |
 | `tools\gates.json` | 1 KB | the six patches expressed as data instead of code |
 | `tools\ghidra\DumpDecomp.java` | 3 KB | regenerates the decompiled reference from the payload |
 | `tools\overlay\overlay.cpp` | 8 KB | the loading card drawn over the game, driven by real progress |
@@ -45,11 +46,21 @@ empty — Windows Explorer shows folders at the top level, so open them.
 | `work\payload.stripped.dll` | the same image with the six gates removed, built by `strip_gates.ps1` |
 | `data\offsets.genuine.bridge` | signed offsets manifest (275 KB, 3,071 entries) |
 
+## Approximate source
+
+| Path | What it is |
+|---|---|
+| `decompiled\00\` .. `decompiled\06\` | 11,150 functions, one `FUN_<address>.c` per file, bucketed by RVA |
+| `decompiled\README.md` | what the reconstruction is, how to grep it, how to regenerate it |
+
+Every function body is Ghidra output. It is not the original source, it does not
+compile, and nothing here pretends otherwise.
+
 ## Documentation
 
 | File | Content |
 |---|---|
-| `README.md` | what it does, requirements, quick start, configs |
+| `README.md` | what it does, how to install it, how to use it, what breaks |
 | `docs\ARCHITECTURE.md` | the six patches with RVAs, pipeline, VAC notes |
 | `docs\DECOMPILED.md` | what the decompiled reference is, and what it is not |
 | `docs\TROUBLESHOOTING.md` | every known error and its fix |

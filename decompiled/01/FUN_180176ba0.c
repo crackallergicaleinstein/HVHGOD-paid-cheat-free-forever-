@@ -1,0 +1,43 @@
+// FUN_180176ba0 - decompiled reference (Ghidra). Not original source, does not compile.
+
+/* 180176ba0 */
+
+void FUN_180176ba0(undefined8 *param_1,ulonglong param_2,undefined2 param_3)
+
+{
+  ulonglong uVar1;
+  ulonglong uVar2;
+  undefined2 *puVar3;
+  undefined1 local_res8;
+  
+  uVar1 = param_1[2];
+  if (param_2 <= uVar1) {
+    param_1[2] = param_2;
+    if (7 < (ulonglong)param_1[3]) {
+      param_1 = (undefined8 *)*param_1;
+    }
+    *(undefined2 *)((longlong)param_1 + param_2 * 2) = 0;
+    return;
+  }
+  uVar2 = param_2 - uVar1;
+  if (param_1[3] - uVar1 < uVar2) {
+    FUN_180179100(param_1,uVar2,local_res8,uVar2,param_3);
+    return;
+  }
+  param_1[2] = param_2;
+  if (7 < (ulonglong)param_1[3]) {
+    param_1 = (undefined8 *)*param_1;
+  }
+  puVar3 = (undefined2 *)((longlong)param_1 + uVar1 * 2);
+  if (uVar2 != 0) {
+    for (; uVar2 != 0; uVar2 = uVar2 - 1) {
+      *puVar3 = param_3;
+      puVar3 = puVar3 + 1;
+    }
+  }
+  *(undefined2 *)((longlong)param_1 + param_2 * 2) = 0;
+  return;
+}
+
+
+
