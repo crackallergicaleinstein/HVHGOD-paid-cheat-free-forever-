@@ -41,7 +41,7 @@ empty — Windows Explorer shows folders at the top level, so open them.
 
 | File | What it is |
 |---|---|
-| `payload\payload.clean.dll` | the original internal image (60 MB, from the Releases page) |
+| `payload\payload.clean.dll` | the original internal image (60 MB, committed in this repo) |
 | `work\payload.stripped.dll` | the same image with the six gates removed, built by `strip_gates.ps1` |
 | `data\offsets.genuine.bridge` | signed offsets manifest (275 KB, 3,071 entries) |
 

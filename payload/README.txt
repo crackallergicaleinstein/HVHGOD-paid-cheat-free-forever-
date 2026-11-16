@@ -1,12 +1,10 @@
-Put the internal image here as:
+The internal image lives here as:
 
     payload.clean.dll
 
-It is 60,192,400 bytes. It is shipped as a GitHub Release asset, not as a
-commit, because a 60 MB binary does not belong in git history.
-
-Download it from the Releases page of this repository, or from wherever the
-release was mirrored, and drop it in this folder. Then run:
+It is 60,192,400 bytes and it is committed to this repo, so a fresh clone
+already has the cheat in it. No release hunt, no download link, no "ask the
+vendor nicely". Clone and build, that is the whole ritual.
 
     pwsh -File build.ps1
 

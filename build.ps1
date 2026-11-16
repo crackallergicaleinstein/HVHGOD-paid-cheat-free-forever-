@@ -66,8 +66,8 @@ if (-not $NoPayload) {
     $clean = Join-Path $root 'payload\payload.clean.dll'
     $strip = Join-Path $root 'work\payload.stripped.dll'
     if (-not (Test-Path -LiteralPath $clean)) {
-        Bad 'missing payload\payload.clean.dll - download it from the Releases page'
-        Bad 'or run: pwsh -File build.ps1 -NoPayload'
+        Bad 'missing payload\payload.clean.dll - it is committed to the repo, so this clone is broken'
+        Bad 're-clone the repository, or run: pwsh -File build.ps1 -NoPayload'
         exit 1
     }
     Step 'stripping licence gates'
