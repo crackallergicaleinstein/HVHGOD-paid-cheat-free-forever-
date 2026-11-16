@@ -1,0 +1,8 @@
+[
+  { "rva": "0x001950", "expect": "55 41 57", "write": "B0 01 C3", "note": "delivery verifier" },
+  { "rva": "0x0A9120", "expect": "48 83 EC", "write": "B0 01 C3", "note": "bridge init" },
+  { "rva": "0x166F60", "expect": "48 89 5C", "write": "B0 01 C3", "note": "pid bind" },
+  { "rva": "0x0E5780", "expect": "48", "write": "C3", "note": "watchdog" },
+  { "rva": "0x41F290", "expect": "48", "write": "C3", "note": "unload routine" },
+  { "rva": "0x0E4230", "expect": "48 89 5C 24 08", "write": "C6 05 11 4E AD 00 01 C6 05 E3 CB B8 00 01 C6 05 DB CB B8 00 01 B0 01 C3", "note": "auth + seeds" }
+]
