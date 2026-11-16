@@ -15,6 +15,8 @@ empty — Windows Explorer shows folders at the top level, so open them.
 | `tools\strip_gates.ps1` | 5 KB | applies the six payload patches |
 | `tools\bytepatch.ps1` | 4 KB | applies arbitrary byte edits from a JSON list, with an expect-check |
 | `tools\split_decomp.ps1` | 2 KB | splits a Ghidra `decompiled.c` into the `decompiled\` tree |
+| `tools\stealth.ps1` | 9 KB | scans a live process for RWX / private PE tells, scrubs the mapped header band |
+| `tools\scrub_image.ps1` | 6 KB | zeroes vendor metadata (Rich header, timestamp, section names, PDB path) |
 | `tools\gates.json` | 1 KB | the six patches expressed as data instead of code |
 | `tools\ghidra\DumpDecomp.java` | 3 KB | regenerates the decompiled reference from the payload |
 | `tools\overlay\overlay.cpp` | 8 KB | the loading card drawn over the game, driven by real progress |
@@ -64,6 +66,7 @@ compile, and nothing here pretends otherwise.
 | `docs\ARCHITECTURE.md` | the six patches with RVAs, pipeline, VAC notes |
 | `docs\DECOMPILED.md` | what the decompiled reference is, and what it is not |
 | `docs\TROUBLESHOOTING.md` | every known error and its fix |
+| `docs\VAC.md` | what VAC actually catches, the stealth layers, and the honest limits |
 | `docs\STANDALONE-HOWTO.md` | long-form engineering notes from the build-out |
 | `launcher\DESIGN.md` | brief for restyling the launcher |
 | `payload\README.txt` | where the payload goes |

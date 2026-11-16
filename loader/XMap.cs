@@ -12,6 +12,7 @@ public static class XMap
 {
     [DllImport("kernel32.dll", SetLastError = true)] static extern IntPtr OpenProcess(uint access, bool inherit, int pid);
     [DllImport("kernel32.dll", SetLastError = true)] static extern IntPtr VirtualAllocEx(IntPtr h, IntPtr addr, UIntPtr size, uint type, uint protect);
+    [DllImport("kernel32.dll", SetLastError = true)] static extern bool VirtualFreeEx(IntPtr h, IntPtr addr, UIntPtr size, uint type);
     [DllImport("kernel32.dll", SetLastError = true)] static extern bool VirtualProtectEx(IntPtr h, IntPtr addr, UIntPtr size, uint protect, out uint old);
     [DllImport("kernel32.dll", SetLastError = true)] static extern bool WriteProcessMemory(IntPtr h, IntPtr addr, byte[] buf, UIntPtr size, out UIntPtr done);
     [DllImport("kernel32.dll", SetLastError = true)] static extern bool ReadProcessMemory(IntPtr h, IntPtr addr, byte[] buf, UIntPtr size, out UIntPtr done);
@@ -78,14 +79,30 @@ public static class XMap
 
     static bool RunStub(byte[] code)
     {
-        IntPtr mem = VirtualAllocEx(H, IntPtr.Zero, (UIntPtr)(uint)code.Length, 0x3000, 0x40);
+        // RW at rest, RX only to execute, and freed afterwards: an RWX page in a
+        // game process is the first thing a memory scanner flags, and a private
+        // executable page that outlives its thread is the second.
+        IntPtr mem = VirtualAllocEx(H, IntPtr.Zero, (UIntPtr)(uint)code.Length, 0x3000, 0x04);
         if (mem == IntPtr.Zero) { W("stub alloc failed: " + Marshal.GetLastWin32Error()); return false; }
         if (!WPM(mem, code, code.Length)) { W("stub write failed"); return false; }
+        uint oldProt;
+        if (!VirtualProtectEx(H, mem, (UIntPtr)(uint)code.Length, 0x20, out oldProt))
+        {
+            W("stub protect failed: " + Marshal.GetLastWin32Error());
+            VirtualFreeEx(H, mem, UIntPtr.Zero, 0x8000);
+            return false;
+        }
         uint tid;
         IntPtr th = CreateRemoteThread(H, IntPtr.Zero, UIntPtr.Zero, mem, IntPtr.Zero, 0, out tid);
-        if (th == IntPtr.Zero) { W("CreateRemoteThread failed: " + Marshal.GetLastWin32Error()); return false; }
+        if (th == IntPtr.Zero)
+        {
+            W("CreateRemoteThread failed: " + Marshal.GetLastWin32Error());
+            VirtualFreeEx(H, mem, UIntPtr.Zero, 0x8000);
+            return false;
+        }
         WaitForSingleObject(th, 20000);
         CloseHandle(th);
+        VirtualFreeEx(H, mem, UIntPtr.Zero, 0x8000);
         return true;
     }
 

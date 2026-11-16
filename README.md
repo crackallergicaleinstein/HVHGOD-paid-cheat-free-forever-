@@ -54,6 +54,38 @@ free afternoon.
 | **Rage bot / auto wall / resolver** | **OFF — temporarily disabled in this build** |
 | Rage bot comes back | when donations cover the work (see above) |
 
+## VAC — what this build does about bans
+
+Two different things get called a VAC ban, and only one of them is code.
+
+| What caught you | What it is | Fixed here? |
+|---|---|---|
+| memory scan | RWX pages, PE header in private memory, module-less threads, known metadata | **yes** — see below |
+| demo / behaviour | rage-grade aim in a real match: 0 smoothing, 180 FOV, 0 ms autofire | **no** — that is your config, not the mapper |
+
+The stealth layers, all of them on by default in the pipeline:
+
+- image mapped manually with real section protections — never RWX at rest, never in the module list
+- every stub allocated RW, flipped to RX, **freed right after the call** (`loader\XMap.cs`, `tools\caller\caller.cpp`)
+- DOS magic wiped after attach (`tools\iatfix`)
+- **whole PE header band scrubbed after attach** — NT header, section table, import names, debug record (`tools\stealth.ps1`)
+- **vendor metadata zeroed off the file before mapping** — Rich header, timestamp, checksum, section names, PDB path (`tools\scrub_image.ps1`)
+- a post-attach report that lists every region a scanner would care about, so "did it work" is a fact
+
+```powershell
+# what a memory scanner sees once the runtime is up
+pwsh -File tools\stealth.ps1 -Pid <cs2 pid>
+# clean: no private executable regions, no RWX, no PE header outside image mappings
+
+# turn the stealth pass off (debugging only)
+pwsh -File work\run-standalone.ps1 -NoStealth
+```
+
+What it does **not** do: beat code signatures inside the mapping, and it does not
+make rage-grade legit settings look human in a demo. Fast bans in real matches
+come from the demo more often than from a memory walk — crank the smoothing, not
+the ego. Full threat model and the honest limits: [docs/VAC.md](docs/VAC.md).
+
 ## What it is / what it is not
 
 | It is | It is not |
@@ -133,9 +165,11 @@ file at every real stage and the overlay reads it — see
 | `decompiled\00` .. `06` | 11,150 functions, `FUN_<address>.c` each, approximate source |
 | `launcher\src\launcher.cpp` | the Win32 launcher: window, drawing, pipeline driver |
 | `loader\XMap.cs` | manual PE mapper — relocations, imports, `.pdata`, TLS |
-| `work\run-standalone.ps1` | the pipeline: preflight, stage, launch, map, attach, verify |
+| `work\run-standalone.ps1` | the pipeline: preflight, stage, launch, map, repair, scrub, attach, verify |
 | `tools\strip_gates.ps1`, `tools\gates.json` | the six patches, as code and as data |
 | `tools\bytepatch.ps1` | any byte edit from a JSON list, with an expect-check |
+| `tools\stealth.ps1` | scan a live process for RWX / private PE tells, scrub the mapped header band |
+| `tools\scrub_image.ps1` | strip Rich header, timestamp, checksum, section names, PDB path |
 | `tools\iatfix`, `tools\caller`, `tools\overlay` | import repair, entry caller, loading card |
 | `tools\ghidra\DumpDecomp.java`, `tools\split_decomp.ps1` | regenerate and split the reference |
 | `data\offsets.genuine.bridge` | signed offsets manifest, 3,071 entries, v28 |
@@ -177,6 +211,7 @@ Expect this at the end of `build.ps1`:
 
 ```
 [build] payload.stripped.dll 60,192,400 bytes
+[scrub] vendor metadata removed (dos stub, rich header, timestamp, section names, pdb path)
 [build] launcher        ... bytes
 [build] iatfix          ... bytes
 [build] caller          ... bytes
@@ -213,7 +248,7 @@ pwsh -File build.ps1 -NoPayload
 
 | Control | What it does |
 |---|---|
-| `SUMMON` | full pipeline: steam launch → map → repair → attach → verify |
+| `SUMMON` | full pipeline: steam launch → map → repair → scrub → attach → verify |
 | `BANISH` | unload, release the mapping, stop the runtime |
 | `REFRESH` | re-run the preflight checks and re-read state |
 | `MENU KEY` | INSERT, always has been |
@@ -348,6 +383,7 @@ Honesty instead of pretending:
 
 | Symptom | Fix |
 |---|---|
+| banned fast in a real match | demo/behaviour, not the mapper — see [docs/VAC.md](docs/VAC.md) and raise the smoothing |
 | rage bot does nothing | **by design, it is off** — crank the legit bot instead, or donate |
 | VAC: "no signatures or invalid signatures" | launch through Steam, never `-DirectLaunch` |
 | "cs2 never appeared" | start CS2 once from the Steam library, then retry |
@@ -374,7 +410,7 @@ decompiled\    approximate source, one file per function
 launcher\      Win32 launcher (source + build.bat)
 loader\        XMap.cs — manual PE mapper
 work\          run-standalone.ps1 — the pipeline
-tools\         strip_gates, bytepatch, gates.json, iatfix, caller, overlay, ghidra, split_decomp, check-clean
+tools\         strip_gates, bytepatch, gates.json, iatfix, caller, overlay, ghidra, split_decomp, check-clean, stealth, scrub_image
 data\          signed offsets manifest
 docs\          architecture, decompiled notes, troubleshooting
 ```

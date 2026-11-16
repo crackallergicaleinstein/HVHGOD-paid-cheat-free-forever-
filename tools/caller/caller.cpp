@@ -157,18 +157,33 @@ int wmain(int argc, wchar_t** argv) {
     memcpy(stub + 26, &blockVal, 8);
     memcpy(stub + 36, &entryVal, 8);
 
-    void* stubAddr = VirtualAllocEx(proc, nullptr, sizeof(stub), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    // RW at rest, RX only to execute: an RWX page inside the game is a scanner
+    // magnet, and the two extra calls cost nothing.
+    void* stubAddr = VirtualAllocEx(proc, nullptr, sizeof(stub), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
     if (!stubAddr) { wprintf(L"stub alloc failed\n"); CloseHandle(proc); return 5; }
     WriteProcessMemory(proc, stubAddr, stub, sizeof(stub), nullptr);
+    DWORD stubOld = 0;
+    if (!VirtualProtectEx(proc, stubAddr, sizeof(stub), PAGE_EXECUTE_READ, &stubOld)) {
+        wprintf(L"stub protect failed: %lu\n", GetLastError());
+        VirtualFreeEx(proc, stubAddr, 0, MEM_RELEASE);
+        CloseHandle(proc);
+        return 5;
+    }
 
     HANDLE th = CreateRemoteThread(proc, nullptr, 0,
                                    reinterpret_cast<LPTHREAD_START_ROUTINE>(stubAddr),
                                    nullptr, 0, nullptr);
-    if (!th) { wprintf(L"CreateRemoteThread failed: %lu\n", GetLastError()); CloseHandle(proc); return 6; }
+    if (!th) {
+        wprintf(L"CreateRemoteThread failed: %lu\n", GetLastError());
+        VirtualFreeEx(proc, stubAddr, 0, MEM_RELEASE);
+        CloseHandle(proc);
+        return 6;
+    }
     DWORD wait = WaitForSingleObject(th, 20000);
     DWORD code = 0;
     GetExitCodeThread(th, &code);
     CloseHandle(th);
+    VirtualFreeEx(proc, stubAddr, 0, MEM_RELEASE);   // no private executable page left behind
     wprintf(L"entry call: wait=%lu exit=0x%lX base=0x%llX pid=%lu block=0x%llX\n",
             wait, code, imageBase, GetCurrentProcessId(), blockVal);
     CloseHandle(proc);

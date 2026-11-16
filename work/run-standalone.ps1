@@ -15,6 +15,10 @@ param(
     [int]$BootSeconds   = 24,
     [double]$WatchMinutes = 0,
     [switch]$NoSweep,
+    # After attach the mapped image's PE header is scrubbed and the process is
+    # re-scanned for private executable pages. -NoStealth leaves the header on
+    # disk-in-memory (debugging only - it is the loudest artifact of the map).
+    [switch]$NoStealth,
     # Off by default: a direct cs2.exe launch is not part of Steam's chain and
     # VAC refuses secure servers for it. Steam launch is the supported path.
     [switch]$DirectLaunch
@@ -23,7 +27,13 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 
-if (-not $Payload)  { $Payload  = Join-Path $root 'work\payload.stripped.dll' }
+if (-not $Payload) {
+    # build.ps1 produces the scrubbed copy (vendor metadata zeroed). Prefer it;
+    # fall back to the plain stripped image if the scrub step was skipped.
+    $scrubbed = Join-Path $root 'work\payload.scrubbed.dll'
+    $stripped = Join-Path $root 'work\payload.stripped.dll'
+    $Payload = if (Test-Path -LiteralPath $scrubbed) { $scrubbed } else { $stripped }
+}
 if (-not $Manifest) {
     $Manifest = Join-Path $root 'data\offsets.genuine.bridge'
     if (-not (Test-Path -LiteralPath $Manifest)) {
@@ -247,6 +257,19 @@ if (Test-Path -LiteralPath $iatfix) {
 Progress 90 'finalising'
     & $iatfix wipe $p.Id $baseHex | ForEach-Object { Say "  $_" }
 }
+
+# --- 5c. stealth pass -------------------------------------------------------
+# Clearing the MZ bytes is a half-measure: the NT header, the section table,
+# the import names and the debug record are still readable, and a scanner reads
+# those before it ever looks at code. Scrub the whole header band, then leave
+# the page mapped read-only so a runtime that still pokes at it gets zeros
+# instead of an access violation.
+$stealth = Join-Path $root 'tools\stealth.ps1'
+if (-not $NoStealth -and (Test-Path -LiteralPath $stealth)) {
+    Step '5c' 'stealth pass: scrub the mapped PE header'
+    & pwsh -NoProfile -File $stealth -ProcessId $p.Id -Base $baseHex -Hide 2>&1 | ForEach-Object { Say "  $_" }
+    Say ''
+}
 Say ''
 
 # --- 6. arm the TLS sweep ---------------------------------------------------
@@ -305,6 +328,13 @@ if (-not ($ok -and -not $seen.ContainsKey('fail'))) {
     Say 'last runtime log lines:'
     if (Test-Path -LiteralPath $runtimeLog) { Get-Content -LiteralPath $runtimeLog -Tail 12 | ForEach-Object { Say "  $_" } }
     if (Test-Path -LiteralPath $bridgeLog) { Get-Content -LiteralPath $bridgeLog -Tail 6 | ForEach-Object { Say "  $_" } }
+}
+
+if (-not $NoStealth -and (Test-Path -LiteralPath $stealth)) {
+    Step 8 'stealth report: what a memory scanner sees now'
+    & pwsh -NoProfile -File $stealth -ProcessId $p.Id 2>&1 | ForEach-Object { Say "  $_" }
+    Say '  every line above is a real region: private, RWX or a PE header. empty = clean.'
+    Say ''
 }
 
 Say ''

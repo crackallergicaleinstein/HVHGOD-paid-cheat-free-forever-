@@ -3,6 +3,22 @@
 Symptom → cause → fix. Everything the pipeline prints is also written to
 `work\pipeline.log` and to `%LOCALAPPDATA%\HVHGOD\CS2 Runtime\Internal\Logs\`.
 
+## Banned within a match or two
+
+Check what actually happened before blaming the mapper:
+
+- **Demo / behaviour** — rage-grade legit settings (0 smoothing, 180 FOV, 0 ms
+  autofire) get watched, reported and reviewed. Nothing in the memory layer
+  changes that. Raise the smoothing, cut the FOV, add autofire delay.
+- **Memory tells** — run `pwsh -File tools\stealth.ps1 -Pid <cs2 pid>` while the
+  runtime is up. Any `rwx`, `MZ` or `private` line is a tell that survived; the
+  pipeline's step 8 prints the same report into `work\pipeline.log`.
+- **Code signature** — if the scan is clean and the ban still lands on the first
+  session, the mapping's code is signature-matched. That is not something header
+  scrubbing can fix.
+
+Full threat model: [VAC.md](VAC.md).
+
 ## The rage bot does nothing
 
 Not a bug, not a missing config, not a stale offset. **Rage bot is temporarily

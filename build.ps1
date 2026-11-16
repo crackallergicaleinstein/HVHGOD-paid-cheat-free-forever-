@@ -74,6 +74,13 @@ if (-not $NoPayload) {
     & pwsh -NoProfile -File (Join-Path $root 'tools\strip_gates.ps1') -In $clean -Out $strip
     if (-not (Test-Path -LiteralPath $strip)) { Bad 'strip failed'; exit 1 }
     Ok ("payload.stripped.dll {0:N0} bytes" -f (Get-Item -LiteralPath $strip).Length)
+
+    # vendor metadata is a free fingerprint: Rich header, linker timestamp,
+    # section names, debug record. Zeroed on a copy, never on the input.
+    $scrubbed = Join-Path $root 'work\payload.scrubbed.dll'
+    Step 'scrubbing vendor metadata'
+    & pwsh -NoProfile -File (Join-Path $root 'tools\scrub_image.ps1') -In $strip -Out $scrubbed
+    if (-not (Test-Path -LiteralPath $scrubbed)) { Bad 'scrub failed'; exit 1 }
 } else {
     Step 'payload step skipped'
 }
