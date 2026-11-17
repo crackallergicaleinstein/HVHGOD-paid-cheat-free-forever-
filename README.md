@@ -8,8 +8,12 @@ that costs him nothing to copy.
 
 > ## STATUS
 >
-> **Rage bot is temporarily off.** No rage bot, no auto wall, no resolver. It
-> comes back when donations cover the work — see [Donate](#donate).
+> **Rage bot is gated by two config flags, not by the licence.** Ungating the
+> module was the easy part; the aim path checks `image+0xCAD2E0` (master) and
+> `image+0xC7E1F0` (autofire) on every command and bails with
+> `reason=rage_inactive` when they are zero. The pipeline seeds both at attach
+> (step 5d, `tools\rage_seed.ps1`), so **rage works in this build** unless you
+> pass `-NoRageSeed`. Donations still fund the resolver work and the next cracks.
 >
 > **You get legit bot, and it takes rage-grade numbers.** Smoothing 0-2, FOV
 > 90-180, head-only, autofire 0 ms: that is the [settings table](#legit-bot-with-rage-numbers).
@@ -49,6 +53,7 @@ that costs him nothing to copy.
 | `tools\strip_gates.ps1` + `tools\gates.json` | the six licence patches, as code and as data |
 | `tools\bytepatch.ps1` | any byte edit from a JSON list, with an expect-check |
 | `tools\stealth.ps1` | scan a live process for tells, scrub the mapped header band |
+| `tools\rage_seed.ps1` | seed the two config flags the rage aim path checks (master + autofire) |
 | `tools\scrub_image.ps1` | strip Rich header, timestamp, section names, PDB path |
 | `tools\iatfix`, `tools\caller`, `tools\overlay` | import repair, entry caller, loading card |
 | `data\offsets.genuine.bridge` | signed offsets manifest, 3,071 entries |
@@ -227,7 +232,7 @@ RENDER_RUNTIME_READY    backend=ready fonts=ready window_input=ready
 MENU_INPUT_OWNERSHIP_ACQUIRED
 ```
 
-No `RAGE_BOT_INIT_SUCCESS` — the rage bot is off, remember.
+No `RAGE_BOT_INIT_SUCCESS` line unless the seed ran first — check `Ragebot\rage.log` for `reason=rage_inactive` if the aim does nothing.
 
 Offsets live in `data\offsets.genuine.bridge` and get staged to
 `%LOCALAPPDATA%\HVHGOD\CS2 Runtime\Internal\Bridge\Offsets\offsets.bridge`.
@@ -256,7 +261,7 @@ pwsh -File tools\bytepatch.ps1 -List my-patches.json -In payload\payload.clean.d
 
 ## What is broken
 
-- **Rage bot** — off in this build, temporary.
+- **Rage bot** — the module is ungated, but the two config flags have to be seeded; the pipeline does it in step 5d. Skip that and it logs `rage_inactive` forever.
 - **Configs in-game** — profile list is empty, saving does not stick. The
   runtime expected the vendor loader to hand it a config library over a callback
   that no longer exists. It still writes `loaded-profile.json` on exit.
@@ -270,7 +275,7 @@ pwsh -File tools\bytepatch.ps1 -List my-patches.json -In payload\payload.clean.d
 
 | Symptom | Fix |
 |---|---|
-| rage bot does nothing | by design, it is off — crank the legit bot or donate |
+| rage bot does nothing | the two config flags are 0 — run `pwsh -File tools\rage_seed.ps1 -ProcessId <pid> -Base <base>`; [details](docs/TROUBLESHOOTING.md) |
 | banned fast in a real match | demo/behaviour, not the mapper — [docs/VAC.md](docs/VAC.md) |
 | VAC: "no signatures or invalid signatures" | launch through Steam, never `-DirectLaunch` |
 | "cs2 never appeared" | start CS2 once from the library, then retry |
@@ -332,3 +337,4 @@ downloaded, then calls it a product. Fuck that. The binary is in the tree, the
 patches are in `tools\gates.json`, the approximate source is in `decompiled\`,
 and every address is written down in `docs\`. Compile it, read it, break it,
 butt-plug the resellers — that is what a repo is for.
+

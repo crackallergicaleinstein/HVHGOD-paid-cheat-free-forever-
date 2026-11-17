@@ -16,6 +16,7 @@ empty — Windows Explorer shows folders at the top level, so open them.
 | `tools\bytepatch.ps1` | 4 KB | applies arbitrary byte edits from a JSON list, with an expect-check |
 | `tools\split_decomp.ps1` | 2 KB | splits a Ghidra `decompiled.c` into the `decompiled\` tree |
 | `tools\stealth.ps1` | 9 KB | scans a live process for RWX / private PE tells, scrubs the mapped header band |
+| `tools\rage_seed.ps1` | 5 KB | seeds the rage master + autofire config flags the aim path checks |
 | `tools\scrub_image.ps1` | 6 KB | zeroes vendor metadata (Rich header, timestamp, section names, PDB path) |
 | `tools\gates.json` | 1 KB | the six patches expressed as data instead of code |
 | `tools\ghidra\DumpDecomp.java` | 3 KB | regenerates the decompiled reference from the payload |
@@ -81,3 +82,4 @@ pwsh -File build.ps1
 
 Requires Visual Studio 2022 BuildTools (`vcvars64.bat`). If a toolchain is
 missing, `build.ps1` stops with the exact `winget` line to run.
+

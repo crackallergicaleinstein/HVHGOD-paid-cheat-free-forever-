@@ -21,19 +21,40 @@ Full threat model: [VAC.md](VAC.md).
 
 ## The rage bot does nothing
 
-Not a bug, not a missing config, not a stale offset. **Rage bot is temporarily
-disabled in this build** — no rage bot, no auto wall, no resolver. Legit bot,
-vision, antiaim, movement and skins all work.
+The six licence patches ungate the module, but they do not enable the aim path.
+That path reads two config values on every command and bails out when they are
+zero:
 
-Fix for right now: crank the legit bot instead. Smoothing 0-2, FOV 90-180,
-head-only, autofire delay 0, backtracks maxed, trigger delay 0. That is a
-rage-grade config living in the legit tab, and it is the closest thing to the
-missing module.
+```
+image + 0xCAD2E0   int32   rage master    must be 1, else reason=rage_inactive
+image + 0xC7E1F0   byte    autofire        must be 1, else reason=auto_fire_disabled
+```
 
-Fix for good: the rage bot comes back when donations cover the work. The address
-is at the top of the README and in its Donate section. Do not install a "rage bot
-patch" from a Telegram group to get it back early — that is how people get ratted
-and lose the account anyway.
+Without the vendor loader nothing writes them - the menu toggle goes into a
+config library that is no longer fed - so they stay 0 and `Ragebot\rage.log`
+repeats `RAGE_SCAN_DECISION reason=rage_inactive target=0x0`.
+
+The pipeline seeds both after attach (step 5d, `tools\rage_seed.ps1`). Check it
+yourself while the game is running:
+
+```powershell
+pwsh -File tools\rage_seed.ps1 -ProcessId <cs2 pid> -Base <image base hex>
+# [rage] read back  master=1  autofire=1
+```
+
+Read the values straight out of the process if the log is not convincing:
+
+```powershell
+# any read tool works; the point is base + 0xCAD2E0 == 1
+```
+
+If the seed prints `refused: the runtime rewrote the flags`, a config apply ran
+after the write and put them back. Re-run the seed, or run the pipeline with
+`-NoRageSeed` and fix the config library instead.
+
+Before the seed existed, the fallback was the legit bot with rage numbers -
+smoothing 0-2, FOV 90-180, head-only, autofire 0 ms. That still works and it is
+still quieter in a demo.
 
 ## VAC refuses secure servers
 
@@ -135,3 +156,4 @@ Include:
 - the tail of `Lifecycle\runtime.log`
 - `Crashes\errors.log` if present
 - your Windows build, CS2 build, and whether the game was Steam-launched
+

@@ -19,6 +19,10 @@ param(
     # re-scanned for private executable pages. -NoStealth leaves the header on
     # disk-in-memory (debugging only - it is the loudest artifact of the map).
     [switch]$NoStealth,
+    # The six patches ungate the module; the aim path still checks two config
+    # values nothing writes without the vendor loader. -NoRageSeed leaves them
+    # at 0, which is exactly the old "rage does nothing" session.
+    [switch]$NoRageSeed,
     # Off by default: a direct cs2.exe launch is not part of Steam's chain and
     # VAC refuses secure servers for it. Steam launch is the supported path.
     [switch]$DirectLaunch
@@ -268,6 +272,17 @@ $stealth = Join-Path $root 'tools\stealth.ps1'
 if (-not $NoStealth -and (Test-Path -LiteralPath $stealth)) {
     Step '5c' 'stealth pass: scrub the mapped PE header'
     & pwsh -NoProfile -File $stealth -ProcessId $p.Id -Base $baseHex -Hide 2>&1 | ForEach-Object { Say "  $_" }
+    Say ''
+}
+
+# --- 5d. seed the rage flags ------------------------------------------------
+# Ungating the module is not the same as enabling the aim path. Two config
+# values gate it and nothing writes them without the loader, so every command
+# logs rage_inactive. Seed them from the mapped image.
+$rageSeed = Join-Path $root 'tools\rage_seed.ps1'
+if (-not $NoRageSeed -and (Test-Path -LiteralPath $rageSeed)) {
+    Step '5d' 'seed the rage feature flags'
+    & pwsh -NoProfile -File $rageSeed -ProcessId $p.Id -Base $baseHex 2>&1 | ForEach-Object { Say "  $_" }
     Say ''
 }
 Say ''
