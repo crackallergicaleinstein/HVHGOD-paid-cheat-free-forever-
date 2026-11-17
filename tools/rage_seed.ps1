@@ -9,13 +9,22 @@
 # rage.log repeats `reason=rage_inactive`.
 #
 #   image + 0xCAD2E0  int32  rage master      must be 1   (else rage_inactive)
-#   image + 0xC7E1F0  byte   autofire          must be 1   (else auto_fire_disabled)
+#   image + 0xC7E1F0  byte   autofire         must be 1   (else auto_fire_disabled)
+#   image + 0xCADA90  byte   penetration pass must be 1   (else autowall path is skipped)
+#   image + 0xCAD648  byte   weapon group A   must be 1   (else weapon_feature_disabled)
+#   image + 0xCAD4A0  byte   weapon group B   must be 1   (else weapon_feature_disabled)
+#
+# -Full also seeds the aim sub-features the same way:
+#   image + 0xCAD358  byte   aim gate
+#   image + 0xCAD880  byte   aim sub-mode A
+#   image + 0xCAD8E8  byte   aim sub-mode B
 #
 # This seeds both in the mapped image. Values read back after the write; if the
 # runtime rewrites them from config, the line says so instead of pretending.
 param(
     [Alias('Pid')][Parameter(Mandatory = $true)][int]$ProcessId,
-    [Parameter(Mandatory = $true)][string]$Base
+    [Parameter(Mandatory = $true)][string]$Base,
+    [switch]$Full
 )
 
 $ErrorActionPreference = 'Stop'
@@ -87,27 +96,43 @@ public static class RageSeed
 
 $image = [Convert]::ToUInt64(($Base -replace '^0x', ''), 16)
 $rageRva = [uint64]0xCAD2E0
-$fireRva = [uint64]0xC7E1F0
-
-$rageBefore = [RageSeed]::ReadInt($ProcessId, $image + $rageRva)
-$fireBefore = [RageSeed]::ReadByte($ProcessId, $image + $fireRva)
-Write-Output ("[rage] base 0x{0:X}  master={1}  autofire={2}" -f $image, $rageBefore, $fireBefore)
-
-if ($rageBefore -ne 1) {
-    [RageSeed]::Write($ProcessId, $image + $rageRva, [BitConverter]::GetBytes([int]1))
+$flags = @(
+    @{ Name = 'master';      Rva = [uint64]0xCAD2E0; Size = 4 },
+    @{ Name = 'autofire';    Rva = [uint64]0xC7E1F0; Size = 1 },
+    @{ Name = 'penetration'; Rva = [uint64]0xCADA90; Size = 1 },
+    @{ Name = 'weapon_a';    Rva = [uint64]0xCAD648; Size = 1 },
+    @{ Name = 'weapon_b';    Rva = [uint64]0xCAD4A0; Size = 1 }
+)
+if ($Full) {
+    $flags += @{ Name = 'aim_gate';   Rva = [uint64]0xCAD358; Size = 1 }
+    $flags += @{ Name = 'aim_mode_a'; Rva = [uint64]0xCAD880; Size = 1 }
+    $flags += @{ Name = 'aim_mode_b'; Rva = [uint64]0xCAD8E8; Size = 1 }
 }
-if ($fireBefore -ne 1) {
-    [RageSeed]::Write($ProcessId, $image + $fireRva, [byte[]]@(1))
+
+$before = @{}
+foreach ($f in $flags) {
+    $before[$f.Name] = if ($f.Size -eq 4) { [RageSeed]::ReadInt($ProcessId, $image + $f.Rva) } else { [RageSeed]::ReadByte($ProcessId, $image + $f.Rva) }
+}
+Write-Output ("[rage] base 0x{0:X}  {1}" -f $image, (($before.Keys | ForEach-Object { "$_=$($before[$_])" }) -join '  '))
+
+foreach ($f in $flags) {
+    if ($before[$f.Name] -eq 1) { continue }
+    if ($f.Size -eq 4) { [RageSeed]::Write($ProcessId, $image + $f.Rva, [BitConverter]::GetBytes([int]1)) }
+    else { [RageSeed]::Write($ProcessId, $image + $f.Rva, [byte[]]@(1)) }
 }
 
 Start-Sleep -Milliseconds 250
-$rageAfter = [RageSeed]::ReadInt($ProcessId, $image + $rageRva)
-$fireAfter = [RageSeed]::ReadByte($ProcessId, $image + $fireRva)
-Write-Output ("[rage] read back  master={0}  autofire={1}" -f $rageAfter, $fireAfter)
+$after = @{}
+foreach ($f in $flags) {
+    $after[$f.Name] = if ($f.Size -eq 4) { [RageSeed]::ReadInt($ProcessId, $image + $f.Rva) } else { [RageSeed]::ReadByte($ProcessId, $image + $f.Rva) }
+}
+Write-Output ("[rage] read back  {0}" -f (($after.Keys | ForEach-Object { "$_=$($after[$_])" }) -join '  '))
 
-if ($rageAfter -eq 1 -and $fireAfter -eq 1) {
-    Write-Output '[rage] seeded: the aim path no longer bails on rage_inactive'
+$ok = ($after.Values | Where-Object { $_ -ne 1 }).Count -eq 0
+if ($ok) {
+    Write-Output '[rage] seeded: the aim path no longer bails on rage_inactive / weapon_feature_disabled'
 } else {
     Write-Output '[rage] refused: the runtime rewrote the flags - config is overriding them'
     exit 1
 }
+

@@ -48,6 +48,27 @@ Read the values straight out of the process if the log is not convincing:
 # any read tool works; the point is base + 0xCAD2E0 == 1
 ```
 
+### When rage runs but still does not shoot
+
+Once the flags are seeded the engine scans every command. Read
+`Ragebot\rage.log` for the batch line:
+
+```
+RAGE_SCAN_BATCH ... candidates=8 scanned=32 records=22 traces=0 hits=0 phase_hits=(0,0,0,0)
+```
+
+- `candidates` - enemy controllers in range
+- `scanned` - hitbox records collected
+- `records` - intersections kept
+- `traces` - penetration traces issued. **Zero here means the intersection
+  builder never issued a trace**, so `RAGE_SCAN_DECISION reason=no_eligible_intersection`
+  repeats and nothing fires.
+- `hits` - records that survived penetration + damage
+
+If `traces=0` while `records` is non-zero, the blocker is inside
+`FUN_18025a6d0` / `FUN_180259970`, not in the licence layer and not in the
+flags. That is where the next piece of work is. The legit bot is unaffected and
+still fires (see `Combat\shots.log`, `SHOT_PLANNED`).
 If the seed prints `refused: the runtime rewrote the flags`, a config apply ran
 after the write and put them back. Re-run the seed, or run the pipeline with
 `-NoRageSeed` and fix the config library instead.
@@ -156,4 +177,5 @@ Include:
 - the tail of `Lifecycle\runtime.log`
 - `Crashes\errors.log` if present
 - your Windows build, CS2 build, and whether the game was Steam-launched
+
 
