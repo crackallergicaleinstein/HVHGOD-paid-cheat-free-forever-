@@ -39,21 +39,21 @@
 #pragma comment(lib, "advapi32.lib")
 #pragma comment(lib, "ole32.lib")
 
-// ---------------------------------------------------------------- anime glass palette
-static const COLORREF C_BG      = RGB( 11,  11,  24);
-static const COLORREF C_PANEL   = RGB( 14,  13,  30);
-static const COLORREF C_CARD    = RGB( 22,  20,  46);
-static const COLORREF C_CARD2   = RGB( 34,  30,  68);
-static const COLORREF C_STROKE  = RGB( 96,  90, 150);
-static const COLORREF C_TEXT    = RGB(248, 250, 252);
-static const COLORREF C_DIM     = RGB(164, 174, 212);
-static const COLORREF C_PINK    = RGB(236,  72, 153);
-static const COLORREF C_PINK2   = RGB(244, 114, 182);
-static const COLORREF C_VIOLET  = RGB(139,  92, 246);
-static const COLORREF C_CYAN    = RGB( 56, 189, 248);
-static const COLORREF C_EMBER   = RGB(251, 191,  36);
-static const COLORREF C_OK      = RGB( 52, 211, 153);
-static const COLORREF C_RED     = RGB(251, 113, 133);
+// ---------------------------------------------------------------- anime frosted glass palette
+static const COLORREF C_BG      = RGB( 13,  14,  22);
+static const COLORREF C_PANEL   = RGB( 16,  18,  28);
+static const COLORREF C_CARD    = RGB( 22,  24,  38);
+static const COLORREF C_CARD2   = RGB( 34,  36,  56);
+static const COLORREF C_STROKE  = RGB( 96, 102, 128);
+static const COLORREF C_TEXT    = RGB(244, 246, 250);
+static const COLORREF C_DIM     = RGB(166, 176, 198);
+static const COLORREF C_ROSE    = RGB(188,  54, 108);
+static const COLORREF C_ROSE2   = RGB(214,  76, 132);
+static const COLORREF C_PLUM    = RGB(120,  42,  92);
+static const COLORREF C_SLATE   = RGB(132, 168, 216);
+static const COLORREF C_EMBER   = RGB(240, 185,  85);
+static const COLORREF C_OK      = RGB( 74, 212, 148);
+static const COLORREF C_RED     = RGB(235,  95, 118);
 
 static const int W     = 960, H = 610;
 static const int TITLE = 42;
@@ -79,8 +79,10 @@ static std::vector<Chip> g_chips;
 // ---------------------------------------------------------------- embedded anime assets & anim state
 static ULONG_PTR        g_gdipToken      = 0;
 static Gdiplus::Bitmap* g_imgBg          = nullptr;
-static Gdiplus::Bitmap* g_imgBgCached    = nullptr;
+static Gdiplus::Bitmap* g_imgBgClear     = nullptr;
+static Gdiplus::Bitmap* g_imgBgBlurred   = nullptr;
 static Gdiplus::Bitmap* g_imgHero        = nullptr;
+static Gdiplus::Bitmap* g_imgAvatar      = nullptr;
 static Gdiplus::Bitmap* g_imgChibi       = nullptr;
 static HDC              g_backDc         = nullptr;
 static HBITMAP          g_backBmp        = nullptr;
@@ -91,49 +93,52 @@ static ULONGLONG        g_animEpoch      = 0;
 static ULONGLONG        g_lastStepTick   = 0;
 static float            g_animTime       = 0.0f;
 static bool             g_isRenderMode   = false;
+static int              g_hoverCard      = -1;
 static float            g_btnAnim[4]     = { 0.0f, 0.0f, 0.0f, 0.0f };
+static float            g_cardAnim[3]    = { 0.0f, 0.0f, 0.0f };
+static float            g_winAnim[2]     = { 0.0f, 0.0f };
 
-struct Particle {
-    float x, y, vy, drift, size, phase, speed;
-    COLORREF color;
-    bool star;
+struct SakuraPetal {
+    float x, y, vx, vy, rot, vrot, scale, phase;
+    BYTE alpha;
+    bool warm;
 };
-static std::vector<Particle> g_bgParticles;
-static std::vector<Particle> g_cardParticles;
+struct RainStreak {
+    float x, y, len, speed;
+    BYTE alpha;
+};
+static std::vector<SakuraPetal> g_petals;
+static std::vector<RainStreak>  g_rain;
 
 static void InitParticles() {
-    if (!g_bgParticles.empty()) return;
-    static const COLORREF cols[4] = { C_PINK2, C_CYAN, C_VIOLET, RGB(248, 224, 255) };
-    uint32_t rng = 0x9E3779B9u;
+    if (!g_petals.empty()) return;
+    uint32_t rng = 0x517CC1B7u;
     auto nextF = [&]() -> float {
         rng = rng * 1664525u + 1013904223u;
         return static_cast<float>((rng >> 8) & 0xFFFFu) / 65535.0f;
     };
-    for (int i = 0; i < 28; i++) {
-        Particle p{};
+    for (int i = 0; i < 18; i++) {
+        SakuraPetal p{};
         p.x     = nextF() * static_cast<float>(W);
         p.y     = nextF() * static_cast<float>(CW_H);
-        p.vy    = 14.0f + nextF() * 24.0f;
-        p.drift = 8.0f + nextF() * 14.0f;
-        p.size  = 2.2f + nextF() * 4.5f;
+        p.vx    = 14.0f + nextF() * 18.0f;
+        p.vy    = 16.0f + nextF() * 18.0f;
+        p.rot   = nextF() * 360.0f;
+        p.vrot  = (nextF() - 0.5f) * 65.0f;
+        p.scale = 0.65f + nextF() * 0.65f;
         p.phase = nextF() * 6.28318f;
-        p.speed = 1.4f + nextF() * 2.2f;
-        p.color = cols[i % 4];
-        p.star  = (i % 3 == 0);
-        g_bgParticles.push_back(p);
+        p.alpha = static_cast<BYTE>(55 + nextF() * 65.0f);
+        p.warm  = (i % 3 == 0);
+        g_petals.push_back(p);
     }
-    for (int i = 0; i < 12; i++) {
-        Particle p{};
-        p.x     = 14.0f + nextF() * 246.0f;
-        p.y     = 20.0f + nextF() * 350.0f;
-        p.vy    = 16.0f + nextF() * 22.0f;
-        p.drift = 5.0f + nextF() * 9.0f;
-        p.size  = 3.0f + nextF() * 4.5f;
-        p.phase = nextF() * 6.28318f;
-        p.speed = 2.0f + nextF() * 2.5f;
-        p.color = (i % 2 == 0) ? C_PINK2 : C_CYAN;
-        p.star  = (i % 2 == 0);
-        g_cardParticles.push_back(p);
+    for (int i = 0; i < 26; i++) {
+        RainStreak r{};
+        r.x     = nextF() * 274.0f;
+        r.y     = nextF() * 394.0f;
+        r.len   = 14.0f + nextF() * 16.0f;
+        r.speed = 340.0f + nextF() * 190.0f;
+        r.alpha = static_cast<BYTE>(18 + nextF() * 24.0f);
+        g_rain.push_back(r);
     }
 }
 
@@ -142,25 +147,42 @@ static void StepAnimations() {
     if (g_animEpoch == 0) g_animEpoch = now;
     if (g_lastStepTick == 0) g_lastStepTick = now;
     float dt = static_cast<float>(now - g_lastStepTick) * 0.001f;
-    if (dt > 0.1f) dt = 0.025f;
+    if (dt > 0.08f) dt = 0.016f;
     g_lastStepTick = now;
     g_animTime = static_cast<float>(now - g_animEpoch) * 0.001f;
 
-    // Smooth hover transition on action buttons
-    float rate = dt * 10.0f;
+    float rate = dt * 12.0f;
     if (rate > 1.0f) rate = 1.0f;
     for (int i = 0; i < 4; i++) {
         float target = (g_hover == (i + 1)) ? 1.0f : 0.0f;
         g_btnAnim[i] += (target - g_btnAnim[i]) * rate;
     }
-
-    for (auto& p : g_bgParticles) {
-        p.y -= p.vy * dt;
-        if (p.y < -16.0f) p.y = static_cast<float>(CW_H + 16);
+    for (int i = 0; i < 3; i++) {
+        float target = (g_hoverCard == i) ? 1.0f : 0.0f;
+        g_cardAnim[i] += (target - g_cardAnim[i]) * rate;
     }
-    for (auto& p : g_cardParticles) {
-        p.y -= p.vy * dt;
-        if (p.y < -14.0f) p.y = 394.0f + 14.0f;
+    g_winAnim[0] += (((g_hover == 100) ? 1.0f : 0.0f) - g_winAnim[0]) * rate;
+    g_winAnim[1] += (((g_hover == 101) ? 1.0f : 0.0f) - g_winAnim[1]) * rate;
+
+    for (auto& p : g_petals) {
+        p.x += (p.vx + std::sinf(g_animTime * 0.9f + p.phase) * 7.0f) * dt;
+        p.y += p.vy * dt;
+        p.rot += p.vrot * dt;
+        if (p.y > static_cast<float>(CW_H + 18)) {
+            p.y = -18.0f;
+            p.x -= 120.0f;
+        }
+        if (p.x > static_cast<float>(W + 24)) p.x = -24.0f;
+        if (p.x < -24.0f) p.x += static_cast<float>(W + 40);
+    }
+    for (auto& r : g_rain) {
+        r.y += r.speed * dt;
+        r.x -= r.speed * 0.08f * dt;
+        if (r.y > 394.0f + r.len) {
+            r.y = -r.len;
+            r.x += 32.0f;
+            if (r.x > 274.0f) r.x -= 274.0f;
+        }
     }
 }
 
@@ -184,6 +206,7 @@ static Gdiplus::Bitmap* DecodeEmbeddedImage(const unsigned char* data, size_t si
         UINT h = decoded->GetHeight();
         cached = new Gdiplus::Bitmap(static_cast<INT>(w), static_cast<INT>(h), PixelFormat32bppPARGB);
         Gdiplus::Graphics cg(cached);
+        cg.Clear(Gdiplus::Color(0, 0, 0, 0));
         cg.DrawImage(decoded, 0, 0, static_cast<INT>(w), static_cast<INT>(h));
     }
     delete decoded;
@@ -191,48 +214,130 @@ static Gdiplus::Bitmap* DecodeEmbeddedImage(const unsigned char* data, size_t si
     return cached;
 }
 
-static void BuildCachedBackdrop() {
-    delete g_imgBgCached;
-    g_imgBgCached = new Gdiplus::Bitmap(W, CW_H, PixelFormat32bppPARGB);
-    Gdiplus::Graphics bg(g_imgBgCached);
-    bg.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
-    if (g_imgBg) {
-        bg.DrawImage(g_imgBg, Gdiplus::RectF(0.0f, 0.0f, static_cast<float>(W), static_cast<float>(CW_H)),
-                     0.0f, 0.0f, static_cast<float>(g_imgBg->GetWidth()), static_cast<float>(g_imgBg->GetHeight()),
-                     Gdiplus::UnitPixel);
-    } else {
-        Gdiplus::SolidBrush fb(Gdiplus::Color(255, 11, 11, 24));
-        bg.FillRectangle(&fb, 0, 0, W, CW_H);
+static void BoxBlurBitmap(Gdiplus::Bitmap* bmp, int radius, int passes) {
+    if (!bmp || radius < 1) return;
+    INT w = static_cast<INT>(bmp->GetWidth());
+    INT h = static_cast<INT>(bmp->GetHeight());
+    Gdiplus::Rect rect(0, 0, w, h);
+    Gdiplus::BitmapData bd{};
+    if (bmp->LockBits(&rect, Gdiplus::ImageLockModeRead | Gdiplus::ImageLockModeWrite,
+                      PixelFormat32bppPARGB, &bd) != Gdiplus::Ok) {
+        return;
     }
-    Gdiplus::LinearGradientBrush hVignette(
-        Gdiplus::PointF(0.0f, 0.0f), Gdiplus::PointF(static_cast<float>(W), 0.0f),
-        Gdiplus::Color(168, 10, 10, 26), Gdiplus::Color(122, 14, 12, 32));
-    bg.FillRectangle(&hVignette, 0, 0, W, CW_H);
+    int stride = bd.Stride / 4;
+    std::vector<uint32_t> tmp(static_cast<size_t>(w) * static_cast<size_t>(h));
+    uint32_t* px = static_cast<uint32_t*>(bd.Scan0);
+    int win = radius * 2 + 1;
 
-    Gdiplus::LinearGradientBrush vVignette(
-        Gdiplus::PointF(0.0f, 0.0f), Gdiplus::PointF(0.0f, static_cast<float>(CW_H)),
-        Gdiplus::Color(36, 10, 10, 26), Gdiplus::Color(166, 8, 8, 22));
-    bg.FillRectangle(&vVignette, 0, 0, W, CW_H);
+    for (int pass = 0; pass < passes; pass++) {
+        for (int y = 0; y < h; y++) {
+            uint32_t* row = px + y * stride;
+            uint32_t* out = tmp.data() + y * w;
+            int sr = 0, sg = 0, sb = 0;
+            for (int k = -radius; k <= radius; k++) {
+                int sx = (k < 0) ? 0 : (k >= w ? w - 1 : k);
+                uint32_t c = row[sx];
+                sr += (c >> 16) & 0xFF;
+                sg += (c >> 8) & 0xFF;
+                sb += c & 0xFF;
+            }
+            for (int x = 0; x < w; x++) {
+                out[x] = 0xFF000000u |
+                         (static_cast<uint32_t>(sr / win) << 16) |
+                         (static_cast<uint32_t>(sg / win) << 8) |
+                         static_cast<uint32_t>(sb / win);
+                int addX = x + radius + 1; if (addX >= w) addX = w - 1;
+                int remX = x - radius;     if (remX < 0) remX = 0;
+                uint32_t cAdd = row[addX], cRem = row[remX];
+                sr += static_cast<int>((cAdd >> 16) & 0xFF) - static_cast<int>((cRem >> 16) & 0xFF);
+                sg += static_cast<int>((cAdd >> 8) & 0xFF) - static_cast<int>((cRem >> 8) & 0xFF);
+                sb += static_cast<int>(cAdd & 0xFF) - static_cast<int>(cRem & 0xFF);
+            }
+        }
+        for (int x = 0; x < w; x++) {
+            int sr = 0, sg = 0, sb = 0;
+            for (int k = -radius; k <= radius; k++) {
+                int sy = (k < 0) ? 0 : (k >= h ? h - 1 : k);
+                uint32_t c = tmp[static_cast<size_t>(sy) * w + x];
+                sr += (c >> 16) & 0xFF;
+                sg += (c >> 8) & 0xFF;
+                sb += c & 0xFF;
+            }
+            for (int y = 0; y < h; y++) {
+                px[y * stride + x] = 0xFF000000u |
+                                     (static_cast<uint32_t>(sr / win) << 16) |
+                                     (static_cast<uint32_t>(sg / win) << 8) |
+                                     static_cast<uint32_t>(sb / win);
+                int addY = y + radius + 1; if (addY >= h) addY = h - 1;
+                int remY = y - radius;     if (remY < 0) remY = 0;
+                uint32_t cAdd = tmp[static_cast<size_t>(addY) * w + x];
+                uint32_t cRem = tmp[static_cast<size_t>(remY) * w + x];
+                sr += static_cast<int>((cAdd >> 16) & 0xFF) - static_cast<int>((cRem >> 16) & 0xFF);
+                sg += static_cast<int>((cAdd >> 8) & 0xFF) - static_cast<int>((cRem >> 8) & 0xFF);
+                sb += static_cast<int>(cAdd & 0xFF) - static_cast<int>(cRem & 0xFF);
+            }
+        }
+    }
+    bmp->UnlockBits(&bd);
+}
 
-    Gdiplus::SolidBrush glowPink(Gdiplus::Color(22, 236, 72, 153));
-    Gdiplus::SolidBrush glowCyan(Gdiplus::Color(18, 56, 189, 248));
-    bg.FillEllipse(&glowPink, -60.0f, 40.0f, 340.0f, 260.0f);
-    bg.FillEllipse(&glowCyan, static_cast<float>(W) - 340.0f, 180.0f, 380.0f, 320.0f);
+static void BuildBackdropLayers() {
+    delete g_imgBgClear;
+    delete g_imgBgBlurred;
+    g_imgBgClear   = new Gdiplus::Bitmap(W, CW_H, PixelFormat32bppPARGB);
+    g_imgBgBlurred = new Gdiplus::Bitmap(W, CW_H, PixelFormat32bppPARGB);
+
+    {
+        Gdiplus::Graphics gc(g_imgBgClear);
+        gc.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
+        if (g_imgBg) {
+            gc.DrawImage(g_imgBg, Gdiplus::RectF(0.0f, 0.0f, static_cast<float>(W), static_cast<float>(CW_H)),
+                         0.0f, 0.0f, static_cast<float>(g_imgBg->GetWidth()), static_cast<float>(g_imgBg->GetHeight()),
+                         Gdiplus::UnitPixel);
+        } else {
+            Gdiplus::SolidBrush fb(Gdiplus::Color(255, 13, 14, 22));
+            gc.FillRectangle(&fb, 0, 0, W, CW_H);
+        }
+        Gdiplus::LinearGradientBrush shade(
+            Gdiplus::PointF(0.0f, 0.0f), Gdiplus::PointF(static_cast<float>(W), static_cast<float>(CW_H)),
+            Gdiplus::Color(92, 10, 11, 20), Gdiplus::Color(70, 12, 13, 24));
+        gc.FillRectangle(&shade, 0, 0, W, CW_H);
+
+        Gdiplus::LinearGradientBrush bottomFade(
+            Gdiplus::PointF(0.0f, static_cast<float>(CW_H - 44)),
+            Gdiplus::PointF(0.0f, static_cast<float>(CW_H)),
+            Gdiplus::Color(0, 10, 11, 20), Gdiplus::Color(158, 10, 11, 20));
+        gc.FillRectangle(&bottomFade, 0, CW_H - 44, W, 44);
+    }
+
+    {
+        Gdiplus::Graphics gb(g_imgBgBlurred);
+        gb.DrawImage(g_imgBgClear, 0, 0);
+    }
+    BoxBlurBitmap(g_imgBgBlurred, 11, 2);
+    {
+        Gdiplus::Graphics gb(g_imgBgBlurred);
+        Gdiplus::SolidBrush frostTint(Gdiplus::Color(136, 12, 13, 22));
+        gb.FillRectangle(&frostTint, 0, 0, W, CW_H);
+    }
 }
 
 static void InitAnimeAssets() {
-    if (!g_imgBg)    g_imgBg    = DecodeEmbeddedImage(kBgAnimeJpg, sizeof(kBgAnimeJpg));
-    if (!g_imgHero)  g_imgHero  = DecodeEmbeddedImage(kHeroAnimeJpg, sizeof(kHeroAnimeJpg));
-    if (!g_imgChibi) g_imgChibi = DecodeEmbeddedImage(kChibiAnimeJpg, sizeof(kChibiAnimeJpg));
-    if (!g_imgBgCached) BuildCachedBackdrop();
+    if (!g_imgBg)     g_imgBg     = DecodeEmbeddedImage(kBgAnimeJpg, sizeof(kBgAnimeJpg));
+    if (!g_imgHero)   g_imgHero   = DecodeEmbeddedImage(kHeroAnimeJpg, sizeof(kHeroAnimeJpg));
+    if (!g_imgAvatar) g_imgAvatar = DecodeEmbeddedImage(kAvatarAnimeJpg, sizeof(kAvatarAnimeJpg));
+    if (!g_imgChibi)  g_imgChibi  = DecodeEmbeddedImage(kChibiAnimePng, sizeof(kChibiAnimePng));
+    if (!g_imgBgClear || !g_imgBgBlurred) BuildBackdropLayers();
     InitParticles();
 }
 
 static void FreeAnimeAssets() {
-    delete g_imgBgCached; g_imgBgCached = nullptr;
-    delete g_imgBg;       g_imgBg = nullptr;
-    delete g_imgHero;     g_imgHero = nullptr;
-    delete g_imgChibi;    g_imgChibi = nullptr;
+    delete g_imgBgClear;   g_imgBgClear = nullptr;
+    delete g_imgBgBlurred; g_imgBgBlurred = nullptr;
+    delete g_imgBg;        g_imgBg = nullptr;
+    delete g_imgHero;      g_imgHero = nullptr;
+    delete g_imgAvatar;    g_imgAvatar = nullptr;
+    delete g_imgChibi;     g_imgChibi = nullptr;
 }
 
 // ---------------------------------------------------------------- GDI+ drawing helpers
@@ -255,6 +360,39 @@ static void MakeRoundPath(Gdiplus::GraphicsPath& path, float x, float y, float w
     path.CloseFigure();
 }
 
+static void FillFrostedCard(Gdiplus::Graphics& g, float x, float y, float w, float h, float r,
+                            Gdiplus::Color extraTint = Gdiplus::Color(22, 16, 18, 30),
+                            Gdiplus::Color border = Gdiplus::Color(58, 255, 255, 255),
+                            bool specular = true) {
+    Gdiplus::GraphicsPath path;
+    MakeRoundPath(path, x, y, w, h, r);
+
+    Gdiplus::GraphicsState st = g.Save();
+    g.SetClip(&path);
+    if (g_imgBgBlurred) {
+        g.DrawImage(g_imgBgBlurred, Gdiplus::RectF(x, y, w, h), x, y, w, h, Gdiplus::UnitPixel);
+    } else {
+        Gdiplus::SolidBrush fb(Gdiplus::Color(220, 18, 20, 32));
+        g.FillRectangle(&fb, x, y, w, h);
+    }
+    if (extraTint.GetAlpha() > 0) {
+        Gdiplus::SolidBrush tb(extraTint);
+        g.FillRectangle(&tb, x, y, w, h);
+    }
+    if (specular) {
+        Gdiplus::LinearGradientBrush spec(
+            Gdiplus::PointF(x, y), Gdiplus::PointF(x, y + h * 0.45f),
+            Gdiplus::Color(22, 255, 255, 255), Gdiplus::Color(0, 255, 255, 255));
+        g.FillRectangle(&spec, x, y, w, h * 0.45f);
+    }
+    g.Restore(st);
+
+    if (border.GetAlpha() > 0) {
+        Gdiplus::Pen pen(border, 1.0f);
+        g.DrawPath(&pen, &path);
+    }
+}
+
 static void FillRoundGlass(Gdiplus::Graphics& g, float x, float y, float w, float h, float r,
                            Gdiplus::Color c1, Gdiplus::Color c2,
                            Gdiplus::Color border = Gdiplus::Color(60, 255, 255, 255),
@@ -267,11 +405,11 @@ static void FillRoundGlass(Gdiplus::Graphics& g, float x, float y, float w, floa
     if (topSheen && w > 24.0f) {
         Gdiplus::LinearGradientBrush sheen(
             Gdiplus::PointF(x + r, y + 1.0f),
-            Gdiplus::PointF(x + w - r, y + 1.0f),
-            Gdiplus::Color(0, 255, 255, 255),
-            Gdiplus::Color(70, 255, 255, 255));
+            Gdiplus::PointF(x + w * 0.6f, y + 1.0f),
+            Gdiplus::Color(15, 255, 255, 255),
+            Gdiplus::Color(65, 255, 255, 255));
         Gdiplus::Pen sp(&sheen, 1.0f);
-        g.DrawLine(&sp, x + r, y + 1.0f, x + w * 0.5f, y + 1.0f);
+        g.DrawLine(&sp, x + r, y + 1.0f, x + w * 0.55f, y + 1.0f);
     }
 
     if (border.GetAlpha() > 0 && borderW > 0.0f) {
@@ -318,81 +456,42 @@ static float MeasureTextG(Gdiplus::Graphics& g, const std::wstring& s,
 
 static void DrawImageClippedRound(Gdiplus::Graphics& g, Gdiplus::Bitmap* img,
                                   float dx, float dy, float dw, float dh, float r,
-                                  float sx, float sy, float sw, float sh,
-                                  float zoom = 1.0f, float ox = 0.0f, float oy = 0.0f) {
+                                  float sx, float sy, float sw, float sh) {
     if (!img) return;
     Gdiplus::GraphicsState st = g.Save();
     Gdiplus::GraphicsPath path;
     MakeRoundPath(path, dx, dy, dw, dh, r);
     g.SetClip(&path);
-    float zw = dw * zoom;
-    float zh = dh * zoom;
-    float zx = dx - (zw - dw) * 0.5f + ox;
-    float zy = dy - (zh - dh) * 0.5f + oy;
-    g.DrawImage(img, Gdiplus::RectF(zx, zy, zw, zh), sx, sy, sw, sh, Gdiplus::UnitPixel);
+    g.DrawImage(img, Gdiplus::RectF(dx, dy, dw, dh), sx, sy, sw, sh, Gdiplus::UnitPixel);
     g.Restore(st);
 }
 
 static void DrawImageClippedCircle(Gdiplus::Graphics& g, Gdiplus::Bitmap* img,
                                    float dx, float dy, float size,
-                                   float sx, float sy, float sw, float sh,
-                                   float zoom = 1.0f, float ox = 0.0f, float oy = 0.0f) {
+                                   float sx, float sy, float sw, float sh) {
     if (!img) return;
     Gdiplus::GraphicsState st = g.Save();
     Gdiplus::GraphicsPath path;
     path.AddEllipse(dx, dy, size, size);
     g.SetClip(&path);
-    float zs = size * zoom;
-    float zx = dx - (zs - size) * 0.5f + ox;
-    float zy = dy - (zs - size) * 0.5f + oy;
-    g.DrawImage(img, Gdiplus::RectF(zx, zy, zs, zs), sx, sy, sw, sh, Gdiplus::UnitPixel);
+    g.DrawImage(img, Gdiplus::RectF(dx, dy, size, size), sx, sy, sw, sh, Gdiplus::UnitPixel);
     g.Restore(st);
 }
 
-static void DrawGlowDot(Gdiplus::Graphics& g, float cx, float cy, float r, COLORREF c) {
-    Gdiplus::SolidBrush halo1(GCol(48, c));
-    Gdiplus::SolidBrush halo2(GCol(110, c));
+static void DrawSoftDot(Gdiplus::Graphics& g, float cx, float cy, float r, COLORREF c, float pulse = 0.5f) {
+    BYTE ha = static_cast<BYTE>(28.0f + 36.0f * pulse);
+    Gdiplus::SolidBrush halo(GCol(ha, c));
     Gdiplus::SolidBrush core(GCol(255, c));
-    g.FillEllipse(&halo1, cx - r * 2.2f, cy - r * 2.2f, r * 4.4f, r * 4.4f);
-    g.FillEllipse(&halo2, cx - r * 1.45f, cy - r * 1.45f, r * 2.9f, r * 2.9f);
+    g.FillEllipse(&halo, cx - r * 2.1f, cy - r * 2.1f, r * 4.2f, r * 4.2f);
     g.FillEllipse(&core, cx - r, cy - r, r * 2.0f, r * 2.0f);
-}
-
-static void DrawPulseRing(Gdiplus::Graphics& g, float cx, float cy, float baseR, float phase, COLORREF c) {
-    float p = std::fmodf(phase, 1.0f);
-    if (p < 0.0f) p += 1.0f;
-    float r = baseR + p * (baseR * 2.4f);
-    BYTE a = static_cast<BYTE>((1.0f - p) * (1.0f - p) * 165.0f);
-    if (a < 4) return;
-    Gdiplus::Pen pen(GCol(a, c), 1.3f);
-    g.DrawEllipse(&pen, cx - r, cy - r, r * 2.0f, r * 2.0f);
-}
-
-static void DrawSparkleStar(Gdiplus::Graphics& g, float cx, float cy, float r, BYTE alpha, COLORREF c) {
-    if (alpha < 6 || r < 0.8f) return;
-    Gdiplus::SolidBrush glow(GCol(static_cast<BYTE>(alpha / 3), c));
-    g.FillEllipse(&glow, cx - r * 1.1f, cy - r * 1.1f, r * 2.2f, r * 2.2f);
-    float inner = r * 0.28f;
-    Gdiplus::PointF pts[8] = {
-        { cx,         cy - r     },
-        { cx + inner, cy - inner },
-        { cx + r,     cy         },
-        { cx + inner, cy + inner },
-        { cx,         cy + r     },
-        { cx - inner, cy + inner },
-        { cx - r,     cy         },
-        { cx - inner, cy - inner },
-    };
-    Gdiplus::SolidBrush br(GCol(alpha, c));
-    g.FillPolygon(&br, pts, 8);
 }
 
 static void DrawShineSweep(Gdiplus::Graphics& g, float x, float y, float w, float h, float r,
                            float periodSec, float sweepDur, float t, BYTE maxAlpha) {
     float cycle = std::fmodf(t, periodSec);
     if (cycle > sweepDur) return;
-    float p = cycle / sweepDur; // 0..1
-    float bandW = w * 0.36f;
+    float p = cycle / sweepDur;
+    float bandW = w * 0.42f;
     float sx = x - bandW + (w + bandW * 2.0f) * p;
 
     Gdiplus::GraphicsState st = g.Save();
@@ -403,12 +502,12 @@ static void DrawShineSweep(Gdiplus::Graphics& g, float x, float y, float w, floa
     Gdiplus::PointF quad[4] = {
         { sx,                y },
         { sx + bandW,        y },
-        { sx + bandW - 32.f, y + h },
-        { sx - 32.f,         y + h },
+        { sx + bandW - 28.f, y + h },
+        { sx - 28.f,         y + h },
     };
     Gdiplus::LinearGradientBrush sheen(
-        Gdiplus::PointF(sx - 16.0f, y),
-        Gdiplus::PointF(sx + bandW - 16.0f, y + h),
+        Gdiplus::PointF(sx - 14.0f, y),
+        Gdiplus::PointF(sx + bandW - 14.0f, y + h),
         Gdiplus::Color(0, 255, 255, 255),
         Gdiplus::Color(maxAlpha, 255, 255, 255));
     Gdiplus::REAL pos[3] = { 0.0f, 0.5f, 1.0f };
@@ -422,22 +521,32 @@ static void DrawShineSweep(Gdiplus::Graphics& g, float x, float y, float w, floa
     g.Restore(st);
 }
 
-static void DrawParticleField(Gdiplus::Graphics& g, const std::vector<Particle>& list,
-                              float offX, float offY, float t) {
-    for (const auto& p : list) {
-        float px = offX + p.x + std::sinf(t * 0.9f + p.phase) * p.drift;
-        float py = offY + p.y;
-        float twinkle = 0.45f + 0.55f * std::sinf(t * p.speed + p.phase);
-        BYTE alpha = static_cast<BYTE>(twinkle * 185.0f);
-        if (p.star) {
-            DrawSparkleStar(g, px, py, p.size * (0.75f + 0.4f * twinkle), alpha, p.color);
-        } else {
-            Gdiplus::SolidBrush halo(GCol(static_cast<BYTE>(alpha / 3), p.color));
-            Gdiplus::SolidBrush core(GCol(alpha, p.color));
-            float r = p.size * 0.65f;
-            g.FillEllipse(&halo, px - r * 2.0f, py - r * 2.0f, r * 4.0f, r * 4.0f);
-            g.FillEllipse(&core, px - r, py - r, r * 2.0f, r * 2.0f);
-        }
+static void DrawSakuraPetals(Gdiplus::Graphics& g) {
+    Gdiplus::GraphicsPath petal;
+    petal.AddBezier(0.0f, -5.0f,  4.2f, -2.5f,  4.5f, 3.0f,  0.0f, 5.2f);
+    petal.AddBezier(0.0f,  5.2f, -4.5f,  3.0f, -4.2f, -2.5f, 0.0f, -5.0f);
+    petal.CloseFigure();
+
+    for (const auto& p : g_petals) {
+        Gdiplus::GraphicsState st = g.Save();
+        g.TranslateTransform(p.x, p.y);
+        g.RotateTransform(p.rot);
+        g.ScaleTransform(p.scale, p.scale * 0.72f);
+        Gdiplus::Color col = p.warm
+            ? Gdiplus::Color(p.alpha, 244, 212, 232)
+            : Gdiplus::Color(p.alpha, 218, 206, 246);
+        Gdiplus::SolidBrush br(col);
+        g.FillPath(&br, &petal);
+        g.Restore(st);
+    }
+}
+
+static void DrawRainStreaks(Gdiplus::Graphics& g, float offX, float offY) {
+    for (const auto& r : g_rain) {
+        Gdiplus::Pen pen(Gdiplus::Color(r.alpha, 204, 218, 238), 1.0f);
+        float rx = offX + r.x;
+        float ry = offY + r.y;
+        g.DrawLine(&pen, rx, ry, rx + r.len * 0.08f, ry - r.len);
     }
 }
 
@@ -727,132 +836,92 @@ static void Paint(HDC hdc, int cw) {
 
     Gdiplus::Graphics g(hdc);
     g.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
-    g.SetInterpolationMode(g_isRenderMode ? Gdiplus::InterpolationModeHighQualityBicubic
-                                          : Gdiplus::InterpolationModeBilinear);
+    g.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
     g.SetTextRenderingHint(Gdiplus::TextRenderingHintAntiAliasGridFit);
 
-    // ---- 1. Cached anime backdrop + animated floating bokeh/starlight particles
-    if (g_imgBgCached) {
-        g.DrawImage(g_imgBgCached, 0, 0);
+    // ---- 1. Crisp scenic anime backdrop + gentle drifting sakura petals
+    if (g_imgBgClear) {
+        g.DrawImage(g_imgBgClear, 0, 0);
     } else {
         Gdiplus::SolidBrush fallback(GCol(255, C_BG));
         g.FillRectangle(&fallback, 0, 0, cw, CW_H);
     }
+    DrawSakuraPetals(g);
 
-    // Subtle breathing ambient neon glow + floating particles
+    // ---- 2. Minimal frosted title strip
     {
-        float pulse = 0.5f + 0.5f * std::sinf(t * 1.4f);
-        Gdiplus::SolidBrush glowPink(Gdiplus::Color(static_cast<BYTE>(12 + 16 * pulse), 236, 72, 153));
-        Gdiplus::SolidBrush glowCyan(Gdiplus::Color(static_cast<BYTE>(10 + 14 * (1.0f - pulse)), 56, 189, 248));
-        g.FillEllipse(&glowPink, -40.0f, 36.0f, 340.0f, 250.0f);
-        g.FillEllipse(&glowCyan, static_cast<float>(cw) - 350.0f, 180.0f, 380.0f, 320.0f);
-        DrawParticleField(g, g_bgParticles, 0.0f, 0.0f, t);
-    }
+        FillFrostedCard(g, 0.0f, 0.0f, static_cast<float>(cw), static_cast<float>(TITLE), 0.0f,
+                        Gdiplus::Color(86, 11, 12, 20), Gdiplus::Color(0, 0, 0, 0), false);
+        Gdiplus::Pen sep(Gdiplus::Color(36, 255, 255, 255), 1.0f);
+        g.DrawLine(&sep, 0.0f, static_cast<float>(TITLE - 1), static_cast<float>(cw), static_cast<float>(TITLE - 1));
 
-    // ---- 2. Title strip
-    {
-        Gdiplus::SolidBrush tb(Gdiplus::Color(188, 12, 12, 30));
-        g.FillRectangle(&tb, 0, 0, cw, TITLE);
-
-        Gdiplus::LinearGradientBrush tbLine(
-            Gdiplus::PointF(0.0f, static_cast<float>(TITLE - 1)),
-            Gdiplus::PointF(static_cast<float>(cw), static_cast<float>(TITLE - 1)),
-            Gdiplus::Color(140, 56, 189, 248),
-            Gdiplus::Color(140, 236, 72, 153));
-        Gdiplus::Pen lp(&tbLine, 1.2f);
-        g.DrawLine(&lp, 0.0f, static_cast<float>(TITLE - 1), static_cast<float>(cw), static_cast<float>(TITLE - 1));
-
-        // Mini circular chibi emblem
         if (g_imgChibi) {
-            DrawImageClippedCircle(g, g_imgChibi, 16.0f, 9.0f, 24.0f,
-                                   0.0f, 0.0f, static_cast<float>(g_imgChibi->GetWidth()),
-                                   static_cast<float>(g_imgChibi->GetHeight()));
+            g.DrawImage(g_imgChibi, Gdiplus::RectF(14.0f, 7.0f, 28.0f, 28.0f),
+                        0.0f, 0.0f, static_cast<float>(g_imgChibi->GetWidth()),
+                        static_cast<float>(g_imgChibi->GetHeight()), Gdiplus::UnitPixel);
         }
-        Gdiplus::LinearGradientBrush ringBr(
-            Gdiplus::PointF(16.0f, 9.0f), Gdiplus::PointF(40.0f, 33.0f),
-            GCol(220, C_CYAN), GCol(220, C_PINK));
-        Gdiplus::Pen ringPen(&ringBr, 1.5f);
-        g.DrawEllipse(&ringPen, 16.0f, 9.0f, 24.0f, 24.0f);
 
-        DrawTextG(g, 49.0f, 13.0f, L"HVHGOD SLUTS", GCol(255, C_TEXT), 13.5f, Gdiplus::FontStyleBold);
+        DrawTextG(g, 48.0f, 13.0f, L"HVHGOD SLUTS", GCol(255, C_TEXT), 13.5f, Gdiplus::FontStyleBold);
 
         {
-            const std::wstring badge = L"ANIME UI";
-            float bw = MeasureTextG(g, badge, 10.0f, Gdiplus::FontStyleBold) + 22.0f;
-            float bx = 162.0f;
-            FillRoundGlass(g, bx, 11.0f, bw, 20.0f, 10.0f,
-                           Gdiplus::Color(90, 139, 92, 246), Gdiplus::Color(90, 236, 72, 153),
-                           Gdiplus::Color(135, 216, 180, 254), 1.0f, false);
-            float btw = MeasureTextG(g, badge, 10.0f, Gdiplus::FontStyleBold);
-            DrawTextG(g, bx + (bw - btw) * 0.5f, 14.5f, badge,
-                      Gdiplus::Color(255, 245, 235, 255), 10.0f, Gdiplus::FontStyleBold);
-            DrawTextG(g, bx + bw + 12.0f, 14.0f, L"cracked internal \u00b7 v28", GCol(215, C_DIM), 11.0f);
+            const std::wstring badge = L"INTERNAL";
+            float bw = MeasureTextG(g, badge, 9.5f, Gdiplus::FontStyleBold) + 18.0f;
+            float bx = 158.0f;
+            FillRoundSolid(g, bx, 11.5f, bw, 19.0f, 9.5f,
+                           Gdiplus::Color(48, 255, 255, 255), Gdiplus::Color(70, 255, 255, 255), 1.0f);
+            float btw = MeasureTextG(g, badge, 9.5f, Gdiplus::FontStyleBold);
+            DrawTextG(g, bx + (bw - btw) * 0.5f, 15.0f, badge,
+                      GCol(240, C_TEXT), 9.5f, Gdiplus::FontStyleBold);
+            DrawTextG(g, bx + bw + 12.0f, 14.0f, L"local runtime \u00b7 v28", GCol(205, C_DIM), 11.0f);
         }
 
-        // Window control buttons (minimize / close)
         float minX = static_cast<float>(cw - 88);
         float clsX = static_cast<float>(cw - 46);
-        FillRoundSolid(g, minX, 6.0f, 36.0f, 30.0f, 8.0f,
-                       g_hover == 100 ? Gdiplus::Color(70, 255, 255, 255) : Gdiplus::Color(0, 0, 0, 0),
-                       g_hover == 100 ? Gdiplus::Color(70, 255, 255, 255) : Gdiplus::Color(0, 0, 0, 0));
-        {
-            Gdiplus::Pen mp(GCol(220, C_DIM), 1.6f);
-            g.DrawLine(&mp, minX + 12.0f, 22.0f, minX + 24.0f, 22.0f);
+        float mH = g_isRenderMode ? (g_hover == 100 ? 1.0f : 0.0f) : g_winAnim[0];
+        float cH = g_isRenderMode ? (g_hover == 101 ? 1.0f : 0.0f) : g_winAnim[1];
+        if (mH > 0.01f) {
+            FillRoundSolid(g, minX, 6.0f, 36.0f, 30.0f, 8.0f,
+                           Gdiplus::Color(static_cast<BYTE>(48.0f * mH), 255, 255, 255));
         }
-
-        FillRoundSolid(g, clsX, 6.0f, 36.0f, 30.0f, 8.0f,
-                       g_hover == 101 ? Gdiplus::Color(200, 236, 72, 153) : Gdiplus::Color(0, 0, 0, 0),
-                       g_hover == 101 ? Gdiplus::Color(140, 255, 255, 255) : Gdiplus::Color(0, 0, 0, 0));
         {
-            Gdiplus::Pen cp(GCol(245, C_TEXT), 1.7f);
+            Gdiplus::Pen mp(GCol(static_cast<BYTE>(205 + 50 * mH), C_DIM), 1.5f);
+            g.DrawLine(&mp, minX + 12.0f, 21.5f, minX + 24.0f, 21.5f);
+        }
+        if (cH > 0.01f) {
+            FillRoundSolid(g, clsX, 6.0f, 36.0f, 30.0f, 8.0f,
+                           Gdiplus::Color(static_cast<BYTE>(185.0f * cH), 188, 54, 108));
+        }
+        {
+            Gdiplus::Pen cp(GCol(245, C_TEXT), 1.6f);
             g.DrawLine(&cp, clsX + 13.0f, 16.0f, clsX + 23.0f, 26.0f);
             g.DrawLine(&cp, clsX + 23.0f, 16.0f, clsX + 13.0f, 26.0f);
         }
     }
 
-    // ---- 3. Left Column: Hero Header Banner (x=22, y=56, w=626, h=88)
+    // ---- 3. Left Column: Frosted Hero Header Banner (x=22, y=56, w=626, h=88)
     {
         float bx = 22.0f, by = 56.0f, bw = 626.0f, bh = 88.0f;
-        FillRoundGlass(g, bx, by, bw, bh, 16.0f,
-                       Gdiplus::Color(168, 34, 24, 72), Gdiplus::Color(150, 20, 28, 62),
-                       Gdiplus::Color(80, 255, 255, 255), 1.0f, true);
+        FillFrostedCard(g, bx, by, bw, bh, 16.0f,
+                        Gdiplus::Color(28, 16, 17, 28), Gdiplus::Color(66, 255, 255, 255), true);
 
-        // Portrait avatar cropped from hero anime art (gentle breathing + rotating neon ring)
         float ax = bx + 14.0f, ay = by + 12.0f, as = 64.0f;
-        float avBreath = std::sinf(t * 1.75f);
-        if (g_imgHero) {
-            float iw = static_cast<float>(g_imgHero->GetWidth());
-            float ih = static_cast<float>(g_imgHero->GetHeight());
-            float crop = iw * 0.62f;
-            float sx = (iw - crop) * 0.5f;
-            float sy = ih * 0.06f;
-            DrawImageClippedCircle(g, g_imgHero, ax, ay, as, sx, sy, crop, crop,
-                                   1.045f + 0.015f * avBreath, 0.0f, avBreath * 1.4f);
+        if (g_imgAvatar) {
+            DrawImageClippedCircle(g, g_imgAvatar, ax, ay, as,
+                                   0.0f, 0.0f, static_cast<float>(g_imgAvatar->GetWidth()),
+                                   static_cast<float>(g_imgAvatar->GetHeight()));
         }
         {
-            float cxA = ax + as * 0.5f, cyA = ay + as * 0.5f;
-            float ang = t * 1.5f;
-            float rx = std::cosf(ang) * (as * 0.5f), ry = std::sinf(ang) * (as * 0.5f);
             Gdiplus::LinearGradientBrush avRing(
-                Gdiplus::PointF(cxA - rx, cyA - ry), Gdiplus::PointF(cxA + rx, cyA + ry),
-                GCol(255, C_CYAN), GCol(255, C_PINK));
-            Gdiplus::Pen avPen(&avRing, 2.2f);
+                Gdiplus::PointF(ax, ay), Gdiplus::PointF(ax + as, ay + as),
+                Gdiplus::Color(185, 255, 255, 255), GCol(215, C_ROSE2));
+            Gdiplus::Pen avPen(&avRing, 1.6f);
             g.DrawEllipse(&avPen, ax, ay, as, as);
         }
 
-        // Small live dot + pulse ring on avatar corner
-        COLORREF dotC = g_cs2Pid ? C_OK : C_PINK2;
-        FillRoundSolid(g, ax + as - 14.0f, ay + as - 14.0f, 12.0f, 12.0f, 6.0f,
-                       Gdiplus::Color(255, 18, 16, 36));
-        DrawPulseRing(g, ax + as - 8.0f, ay + as - 8.0f, 3.8f, t * 0.65f, dotC);
-        DrawGlowDot(g, ax + as - 8.0f, ay + as - 8.0f, 3.8f, dotC);
-
-        // Title + subtitle
-        DrawTextG(g, bx + 94.0f, by + 16.0f, L"HVHGOD SLUTS", Gdiplus::Color(110, 0, 0, 0), 23.0f, Gdiplus::FontStyleBold);
+        DrawTextG(g, bx + 94.0f, by + 16.0f, L"HVHGOD SLUTS", Gdiplus::Color(90, 0, 0, 0), 23.0f, Gdiplus::FontStyleBold);
         DrawTextG(g, bx + 93.0f, by + 15.0f, L"HVHGOD SLUTS", GCol(255, C_TEXT), 23.0f, Gdiplus::FontStyleBold);
-        DrawTextG(g, bx + 94.0f, by + 48.0f, L"cheat cracked \u2014 no loader, no server, no leash", GCol(220, C_DIM), 11.5f);
+        DrawTextG(g, bx + 94.0f, by + 48.0f, L"cheat cracked \u2014 no loader, no server, no leash", GCol(215, C_DIM), 11.5f);
 
-        // Right-aligned runtime status pill
         std::wstring state = L"runtime: " + g_runtime;
         COLORREF sc = g_runtime == L"loose" ? C_OK :
                       g_runtime == L"dead" ? C_DIM : C_EMBER;
@@ -860,10 +929,10 @@ static void Paint(HDC hdc, int cw) {
         float pw = stw + 34.0f;
         float px = bx + bw - 16.0f - pw;
         float py = by + 16.0f;
+        float dotPulse = 0.5f + 0.5f * std::sinf(t * 2.2f);
         FillRoundSolid(g, px, py, pw, 26.0f, 13.0f,
-                       GCol(52, sc), GCol(140, sc), 1.0f);
-        DrawPulseRing(g, px + 14.0f, py + 13.0f, 3.5f, t * 0.55f + 0.3f, sc);
-        DrawGlowDot(g, px + 14.0f, py + 13.0f, 3.5f, sc);
+                       GCol(38, sc), GCol(115, sc), 1.0f);
+        DrawSoftDot(g, px + 14.0f, py + 13.0f, 3.4f, sc, dotPulse);
         DrawTextG(g, px + 24.0f, py + 6.0f, state, GCol(255, sc), 11.0f, Gdiplus::FontStyleBold);
 
         std::wstring entryTxt = L"entry 0x41FCA0 \u00b7 6 gates torn out";
@@ -871,7 +940,7 @@ static void Paint(HDC hdc, int cw) {
         DrawTextG(g, bx + bw - 16.0f - ew, by + 50.0f, entryTxt, GCol(195, C_DIM), 10.5f);
     }
 
-    // ---- 4. Three status cards (y=158, h=82, w=200 each, gap=13 -> 626px total)
+    // ---- 4. Three frosted status cards (y=158, h=82, w=200 each, gap=13 -> 626px total)
     {
         int y = 158;
         int gap = 13, cwid = 200;
@@ -888,21 +957,24 @@ static void Paint(HDC hdc, int cw) {
             { L"OFFSETS", mOk ? FileSizeStr(manifest) : L"missing",
                           mOk ? L"signed manifest v28" : L"copy from capture", mOk },
         };
+        float pulse = 0.5f + 0.5f * std::sinf(t * 2.0f);
         for (int i = 0; i < 3; i++) {
             float x = 22.0f + static_cast<float>(i * (cwid + gap));
             float fy = static_cast<float>(y);
             float fw = static_cast<float>(cwid);
+            float chov = g_isRenderMode ? 0.0f : g_cardAnim[i];
             COLORREF ac = cards[i].ok ? C_OK : C_RED;
 
-            FillRoundGlass(g, x, fy, fw, 82.0f, 14.0f,
-                           Gdiplus::Color(162, 20, 18, 46), Gdiplus::Color(152, 16, 15, 36),
-                           Gdiplus::Color(60, 255, 255, 255), 1.0f, true);
+            Gdiplus::Color tint(static_cast<BYTE>(28.0f - 14.0f * chov),
+                                static_cast<BYTE>(18 + 30 * chov),
+                                static_cast<BYTE>(20 + 32 * chov),
+                                static_cast<BYTE>(32 + 42 * chov));
+            Gdiplus::Color brd(static_cast<BYTE>(55.0f + 55.0f * chov), 255, 255, 255);
+            FillFrostedCard(g, x, fy, fw, 82.0f, 14.0f, tint, brd, true);
 
-            // Vertical neon accent bar on left edge
-            FillRoundSolid(g, x + 1.5f, fy + 16.0f, 3.0f, 50.0f, 1.5f, GCol(215, ac));
-
-            DrawTextG(g, x + 15.0f, fy + 12.0f, cards[i].title, GCol(215, C_DIM), 10.0f, Gdiplus::FontStyleBold);
-            DrawGlowDot(g, x + fw - 18.0f, fy + 17.0f, 3.6f, ac);
+            FillRoundSolid(g, x + 1.5f, fy + 16.0f, 2.5f, 50.0f, 1.2f, GCol(205, ac));
+            DrawTextG(g, x + 15.0f, fy + 12.0f, cards[i].title, GCol(210, C_DIM), 10.0f, Gdiplus::FontStyleBold);
+            DrawSoftDot(g, x + fw - 17.0f, fy + 17.0f, 3.4f, ac, pulse);
 
             DrawTextG(g, x + 15.0f, fy + 30.0f, cards[i].a, GCol(255, C_TEXT), 14.5f, Gdiplus::FontStyleBold);
 
@@ -923,10 +995,10 @@ static void Paint(HDC hdc, int cw) {
         const std::wstring fLbl = L"FEASTING";
         float flw = MeasureTextG(g, fLbl, 9.5f, Gdiplus::FontStyleBold);
         float fbw = flw + 20.0f;
-        FillRoundSolid(g, 22.0f, y, fbw, 24.0f, 12.0f,
-                       Gdiplus::Color(85, 139, 92, 246), Gdiplus::Color(115, 196, 181, 253), 1.0f);
+        FillFrostedCard(g, 22.0f, y, fbw, 24.0f, 12.0f,
+                        Gdiplus::Color(40, 188, 54, 108), Gdiplus::Color(95, 214, 76, 132), false);
         DrawTextG(g, 22.0f + (fbw - flw) * 0.5f, y + 6.0f, fLbl,
-                  Gdiplus::Color(255, 237, 233, 254), 9.5f, Gdiplus::FontStyleBold);
+                  GCol(255, C_TEXT), 9.5f, Gdiplus::FontStyleBold);
 
         float cx = 22.0f + fbw + 10.0f;
         for (auto& c : g_chips) {
@@ -934,41 +1006,35 @@ static void Paint(HDC hdc, int cw) {
             float bw = tw + 28.0f;
             if (cx + bw > 648.0f) break;
             COLORREF cc = c.ok ? C_OK : C_RED;
-            FillRoundSolid(g, cx, y, bw, 24.0f, 12.0f,
-                           c.ok ? Gdiplus::Color(72, 16, 185, 129) : Gdiplus::Color(115, 28, 20, 52),
-                           c.ok ? Gdiplus::Color(155, 52, 211, 153) : Gdiplus::Color(70, 244, 114, 182), 1.0f);
-            DrawGlowDot(g, cx + 11.5f, y + 12.0f, 2.8f, cc);
+            FillFrostedCard(g, cx, y, bw, 24.0f, 12.0f,
+                            c.ok ? Gdiplus::Color(42, 16, 140, 96) : Gdiplus::Color(34, 24, 18, 30),
+                            c.ok ? Gdiplus::Color(125, 74, 212, 148) : Gdiplus::Color(52, 255, 255, 255),
+                            false);
+            DrawSoftDot(g, cx + 11.5f, y + 12.0f, 2.7f, cc, 0.35f);
             DrawTextG(g, cx + 20.0f, y + 5.0f, c.name,
-                      c.ok ? Gdiplus::Color(255, 209, 250, 229) : Gdiplus::Color(235, 226, 208, 226),
+                      c.ok ? Gdiplus::Color(255, 215, 248, 232) : Gdiplus::Color(225, 218, 224, 235),
                       10.5f, Gdiplus::FontStyleBold);
             cx += bw + 7.0f;
         }
     }
 
-    // ---- 6. Glass Terminal / SPAWN LOG (x=22, y=292, w=626, h=260)
+    // ---- 6. Frosted Dark Glass Terminal / SPAWN LOG (x=22, y=292, w=626, h=260)
     {
         float tx = 22.0f, ty = 292.0f, tw = 626.0f, th = 260.0f;
-        FillRoundGlass(g, tx, ty, tw, th, 16.0f,
-                       Gdiplus::Color(196, 11, 11, 28), Gdiplus::Color(208, 9, 9, 24),
-                       Gdiplus::Color(62, 255, 255, 255), 1.0f, true);
+        FillFrostedCard(g, tx, ty, tw, th, 16.0f,
+                        Gdiplus::Color(118, 10, 11, 18), Gdiplus::Color(62, 255, 255, 255), true);
 
-        // Terminal header strip
-        Gdiplus::Pen divPen(Gdiplus::Color(35, 255, 255, 255), 1.0f);
+        Gdiplus::Pen divPen(Gdiplus::Color(32, 255, 255, 255), 1.0f);
         g.DrawLine(&divPen, tx + 1.0f, ty + 34.0f, tx + tw - 1.0f, ty + 34.0f);
 
-        // Animated wave header dots
-        COLORREF dotCols[3] = { C_PINK2, C_VIOLET, C_CYAN };
-        for (int i = 0; i < 3; i++) {
-            float wv = 0.55f + 0.45f * std::sinf(t * 3.0f - static_cast<float>(i) * 0.9f);
-            BYTE da = static_cast<BYTE>(155 + 100 * wv);
-            float dr = 7.4f + 1.4f * wv;
-            float dcx = tx + 20.0f + static_cast<float>(i) * 13.0f;
-            float dcy = ty + 17.0f;
-            Gdiplus::SolidBrush db(GCol(da, dotCols[i]));
-            g.FillEllipse(&db, dcx - dr * 0.5f, dcy - dr * 0.5f, dr, dr);
+        // Minimal clean chevron glyph >_
+        {
+            Gdiplus::Pen cpen(GCol(220, C_ROSE2), 1.5f);
+            g.DrawLine(&cpen, tx + 16.0f, ty + 13.0f, tx + 21.0f, ty + 17.0f);
+            g.DrawLine(&cpen, tx + 21.0f, ty + 17.0f, tx + 16.0f, ty + 21.0f);
+            g.DrawLine(&cpen, tx + 23.0f, ty + 21.0f, tx + 29.0f, ty + 21.0f);
         }
-
-        DrawTextG(g, tx + 62.0f, ty + 10.5f, L"SPAWN LOG", GCol(245, C_TEXT), 10.5f, Gdiplus::FontStyleBold);
+        DrawTextG(g, tx + 38.0f, ty + 10.5f, L"SPAWN LOG", GCol(245, C_TEXT), 10.5f, Gdiplus::FontStyleBold);
 
         if (g_running) {
             DWORD el = (GetTickCount() - g_startTick) / 1000;
@@ -978,84 +1044,67 @@ static void Paint(HDC hdc, int cw) {
             float pillW = tbW + 22.0f;
             float pillX = tx + tw - 14.0f - pillW;
             FillRoundSolid(g, pillX, ty + 7.0f, pillW, 20.0f, 10.0f,
-                           GCol(55, C_EMBER), GCol(140, C_EMBER), 1.0f);
+                           GCol(48, C_EMBER), GCol(130, C_EMBER), 1.0f);
             DrawTextG(g, pillX + (pillW - tbW) * 0.5f, ty + 10.5f, tb, GCol(255, C_EMBER), 10.0f, Gdiplus::FontStyleBold);
         } else {
             const std::wstring rLbl = L"READY";
             float rw = MeasureTextG(g, rLbl, 9.5f, Gdiplus::FontStyleBold);
-            float pillW = rw + 24.0f;
+            float pillW = rw + 22.0f;
             float pillX = tx + tw - 14.0f - pillW;
             FillRoundSolid(g, pillX, ty + 7.0f, pillW, 20.0f, 10.0f,
-                           GCol(40, C_CYAN), GCol(110, C_CYAN), 1.0f);
-            DrawTextG(g, pillX + (pillW - rw) * 0.5f, ty + 11.0f, rLbl, GCol(240, C_CYAN), 9.5f, Gdiplus::FontStyleBold);
+                           GCol(34, C_SLATE), GCol(95, C_SLATE), 1.0f);
+            DrawTextG(g, pillX + (pillW - rw) * 0.5f, ty + 11.0f, rLbl, GCol(240, C_SLATE), 9.5f, Gdiplus::FontStyleBold);
         }
 
-        // Log lines + blinking terminal cursor
         int ch = static_cast<int>(th);
         float lineY = ty + 43.0f;
         int rows = (ch - 52) / 16;
         int total = static_cast<int>(g_log.size());
         int first = total > rows ? total - rows : 0;
-        bool cursorOn = (std::fmodf(t, 1.05f) < 0.58f);
         if (total == 0) {
-            std::wstring idleMsg = L"// awaiting summon sequence... press SUMMON to start runtime";
-            DrawTextG(g, tx + 18.0f, ty + 46.0f, idleMsg,
-                      Gdiplus::Color(145, 164, 174, 212), 10.5f, Gdiplus::FontStyleRegular, L"Consolas");
-            if (cursorOn) {
-                float iw = MeasureTextG(g, idleMsg, 10.5f, Gdiplus::FontStyleRegular, L"Consolas");
-                Gdiplus::SolidBrush curBr(GCol(220, C_CYAN));
-                g.FillRectangle(&curBr, tx + 21.0f + iw, ty + 47.0f, 6.5f, 12.0f);
-            }
+            DrawTextG(g, tx + 18.0f, ty + 46.0f, L"// awaiting summon sequence... press SUMMON to start runtime",
+                      Gdiplus::Color(145, 166, 176, 198), 10.5f, Gdiplus::FontStyleRegular, L"Consolas");
         }
         for (int i = first; i < total; i++) {
             const std::wstring& s = g_log[i];
             COLORREF c = C_DIM;
             if (s.find(L"[error]") != std::wstring::npos || s.find(L"FAIL") != std::wstring::npos ||
                 s.find(L"failed") != std::wstring::npos) c = C_RED;
-            else if (s.find(L"===") != std::wstring::npos) c = C_PINK2;
+            else if (s.find(L"===") != std::wstring::npos) c = C_ROSE2;
             else if (s.find(L"  ") == 0) c = C_TEXT;
             std::wstring lt = s;
             if (lt.size() > 96) lt = lt.substr(0, 95) + L"\u2026";
             DrawTextG(g, tx + 16.0f, lineY, lt, GCol(245, c), 10.5f, Gdiplus::FontStyleRegular, L"Consolas");
-            if (i == total - 1 && cursorOn) {
-                float lw = MeasureTextG(g, lt, 10.5f, Gdiplus::FontStyleRegular, L"Consolas");
-                if (lw < tw - 44.0f) {
-                    Gdiplus::SolidBrush curBr(GCol(215, C_PINK2));
-                    g.FillRectangle(&curBr, tx + 19.0f + lw, lineY + 1.5f, 6.0f, 11.5f);
-                }
-            }
             lineY += 16.0f;
         }
     }
 
-    // ---- 7. Action Buttons (y=566, h=48) with smooth hover lift & shine sweep
+    // ---- 7. Action Buttons (y=566, h=48) with smooth ease-out hover
     for (int bi = 0; bi < 4; bi++) {
         const auto& b = g_btns[bi];
         bool disabled = (b.id == 1 && g_running) || (b.id == 2 && !g_running);
         float hoverAmt = g_isRenderMode ? (g_hover == b.id ? 1.0f : 0.0f) : g_btnAnim[bi];
         if (disabled) hoverAmt = 0.0f;
         float bx = static_cast<float>(b.x);
-        float by = static_cast<float>(b.y) - hoverAmt * 2.0f;
+        float by = static_cast<float>(b.y) - hoverAmt * 1.5f;
         float bw = static_cast<float>(b.w);
         float bh = static_cast<float>(b.h);
 
         if (b.id == 1) {
             if (!disabled) {
-                float glowPulse = 0.5f + 0.5f * std::sinf(t * 2.6f);
-                BYTE ga = static_cast<BYTE>(28.0f + 22.0f * glowPulse + 42.0f * hoverAmt);
-                FillRoundSolid(g, bx - 3.0f, by - 3.0f, bw + 6.0f, bh + 6.0f, 16.0f,
-                               Gdiplus::Color(ga, 236, 72, 153));
+                BYTE ga = static_cast<BYTE>(20.0f + 36.0f * hoverAmt);
+                FillRoundSolid(g, bx - 2.5f, by - 2.5f, bw + 5.0f, bh + 5.0f, 15.5f,
+                               Gdiplus::Color(ga, 188, 54, 108));
                 FillRoundGlass(g, bx, by, bw, bh, 13.0f,
-                               hoverAmt > 0.3f ? GCol(255, C_PINK2) : GCol(245, C_PINK),
-                               GCol(255, C_VIOLET),
-                               Gdiplus::Color(static_cast<BYTE>(140 + 60 * hoverAmt), 255, 255, 255), 1.0f, true);
-                DrawShineSweep(g, bx, by, bw, bh, 13.0f, 3.6f, 0.72f, t + 0.7f, 92);
+                               hoverAmt > 0.3f ? GCol(250, C_ROSE2) : GCol(240, C_ROSE),
+                               GCol(245, C_PLUM),
+                               Gdiplus::Color(static_cast<BYTE>(100 + 80 * hoverAmt), 255, 255, 255), 1.0f, true);
+                DrawShineSweep(g, bx, by, bw, bh, 13.0f, 5.5f, 0.85f, t + 1.0f, 44);
             } else {
-                FillRoundGlass(g, bx, by, bw, bh, 13.0f,
-                               Gdiplus::Color(125, 34, 24, 58), Gdiplus::Color(125, 24, 20, 46),
-                               Gdiplus::Color(45, 255, 255, 255), 1.0f, false);
+                FillFrostedCard(g, bx, by, bw, bh, 13.0f,
+                                Gdiplus::Color(60, 16, 17, 28), Gdiplus::Color(40, 255, 255, 255), false);
             }
-            Gdiplus::Color tc = disabled ? GCol(150, C_DIM) : GCol(255, C_TEXT);
+            Gdiplus::Color tc = disabled ? GCol(140, C_DIM) : GCol(255, C_TEXT);
             float tw = MeasureTextG(g, b.label, 13.0f, Gdiplus::FontStyleBold);
             float startX = bx + (bw - (tw + 18.0f)) * 0.5f;
             Gdiplus::PointF tri[3] = {
@@ -1067,176 +1116,115 @@ static void Paint(HDC hdc, int cw) {
             g.FillPolygon(&tbr, tri, 3);
             DrawTextG(g, startX + 16.0f, by + 16.5f, b.label, tc, 13.0f, Gdiplus::FontStyleBold);
         } else {
-            COLORREF accent = (b.id == 2) ? C_RED : (b.id == 3 ? C_CYAN : C_VIOLET);
-            BYTE aR = GetRValue(accent), aG = GetGValue(accent), aB = GetBValue(accent);
-            BYTE bgA1 = static_cast<BYTE>(158.0f - 55.0f * hoverAmt);
-            Gdiplus::Color bg1(bgA1,
-                               static_cast<BYTE>(22.0f + (aR - 22.0f) * hoverAmt * 0.45f),
-                               static_cast<BYTE>(20.0f + (aG - 20.0f) * hoverAmt * 0.45f),
-                               static_cast<BYTE>(48.0f + (aB - 48.0f) * hoverAmt * 0.45f));
-            Gdiplus::Color bg2(155,
-                               static_cast<BYTE>(16.0f + 12.0f * hoverAmt),
-                               static_cast<BYTE>(15.0f + 10.0f * hoverAmt),
-                               static_cast<BYTE>(38.0f + 24.0f * hoverAmt));
-            Gdiplus::Color brd(static_cast<BYTE>(60.0f + 145.0f * hoverAmt),
-                               static_cast<BYTE>(255.0f + (aR - 255.0f) * hoverAmt),
-                               static_cast<BYTE>(255.0f + (aG - 255.0f) * hoverAmt),
-                               static_cast<BYTE>(255.0f + (aB - 255.0f) * hoverAmt));
-            FillRoundGlass(g, bx, by, bw, bh, 13.0f, bg1, bg2, brd, 1.0f, true);
-            Gdiplus::Color tc = disabled ? GCol(148, C_DIM) : GCol(255, C_TEXT);
+            COLORREF accent = (b.id == 2) ? C_RED : (b.id == 3 ? C_SLATE : C_ROSE2);
+            Gdiplus::Color tint(static_cast<BYTE>(28.0f + 44.0f * hoverAmt),
+                                static_cast<BYTE>(18.0f + (GetRValue(accent) - 18.0f) * hoverAmt * 0.35f),
+                                static_cast<BYTE>(20.0f + (GetGValue(accent) - 20.0f) * hoverAmt * 0.35f),
+                                static_cast<BYTE>(32.0f + (GetBValue(accent) - 32.0f) * hoverAmt * 0.35f));
+            Gdiplus::Color brd(static_cast<BYTE>(58.0f + 115.0f * hoverAmt),
+                               static_cast<BYTE>(255.0f + (GetRValue(accent) - 255.0f) * hoverAmt),
+                               static_cast<BYTE>(255.0f + (GetGValue(accent) - 255.0f) * hoverAmt),
+                               static_cast<BYTE>(255.0f + (GetBValue(accent) - 255.0f) * hoverAmt));
+            FillFrostedCard(g, bx, by, bw, bh, 13.0f, tint, brd, true);
+            Gdiplus::Color tc = disabled ? GCol(135, C_DIM) : GCol(255, C_TEXT);
             float tw = MeasureTextG(g, b.label, 12.0f, Gdiplus::FontStyleBold);
             DrawTextG(g, bx + (bw - tw) * 0.5f, by + 17.0f, b.label, tc, 12.0f, Gdiplus::FontStyleBold);
         }
     }
 
-    // ---- 8. Right Column: Living Anime Showcase Panel (x=664, w=274)
+    // ---- 8. Right Column: Crisp Anime Showcase Card (x=664, y=56, w=274, h=394) with gentle rain
     {
         float sx = 664.0f, sy = 56.0f, sw = 274.0f, sh = 394.0f;
-        float heroBreath = std::sinf(t * 1.55f);
-        float heroSwayX  = std::cosf(t * 0.78f) * 2.8f;
-        float heroSwayY  = heroBreath * 5.2f;
-        float heroZoom   = 1.055f + 0.018f * std::sinf(t * 1.55f + 0.35f);
-
-        // Breathing neon aura behind character card
-        BYTE auraA = static_cast<BYTE>(24.0f + 20.0f * (0.5f + 0.5f * heroBreath));
-        FillRoundSolid(g, sx - 2.5f, sy - 2.5f, sw + 5.0f, sh + 5.0f, 20.0f,
-                       Gdiplus::Color(auraA, 236, 72, 153));
-
         if (g_imgHero) {
             DrawImageClippedRound(g, g_imgHero, sx, sy, sw, sh, 18.0f,
                                   0.0f, 0.0f, static_cast<float>(g_imgHero->GetWidth()),
-                                  static_cast<float>(g_imgHero->GetHeight()),
-                                  heroZoom, heroSwayX, heroSwayY);
+                                  static_cast<float>(g_imgHero->GetHeight()));
         } else {
             FillRoundSolid(g, sx, sy, sw, sh, 18.0f, GCol(255, C_CARD));
         }
 
-        // Bottom dark fade + floating anime particles + light sweep inside character card
         {
             Gdiplus::GraphicsState st = g.Save();
             Gdiplus::GraphicsPath clipPath;
             MakeRoundPath(clipPath, sx, sy, sw, sh, 18.0f);
             g.SetClip(&clipPath);
 
-            DrawParticleField(g, g_cardParticles, sx, sy, t);
+            // Subtle atmospheric rain streaks matching the rainy street artwork
+            DrawRainStreaks(g, sx, sy);
 
             Gdiplus::LinearGradientBrush fade(
-                Gdiplus::PointF(sx, sy + sh * 0.50f),
+                Gdiplus::PointF(sx, sy + sh * 0.54f),
                 Gdiplus::PointF(sx, sy + sh),
-                Gdiplus::Color(0, 12, 10, 28),
-                Gdiplus::Color(240, 11, 10, 28));
-            g.FillRectangle(&fade, sx, sy + sh * 0.50f, sw, sh * 0.50f);
-
-            Gdiplus::LinearGradientBrush topFade(
-                Gdiplus::PointF(sx, sy),
-                Gdiplus::PointF(sx, sy + 55.0f),
-                Gdiplus::Color(70, 12, 10, 30),
-                Gdiplus::Color(0, 12, 10, 30));
-            g.FillRectangle(&topFade, sx, sy, sw, 55.0f);
+                Gdiplus::Color(0, 10, 11, 18),
+                Gdiplus::Color(235, 10, 11, 18));
+            g.FillRectangle(&fade, sx, sy + sh * 0.54f, sw, sh * 0.46f);
             g.Restore(st);
         }
-        DrawShineSweep(g, sx, sy, sw, sh, 18.0f, 5.4f, 0.95f, t + 1.1f, 44);
 
-        // Card border
         {
             Gdiplus::GraphicsPath bp;
             MakeRoundPath(bp, sx, sy, sw, sh, 18.0f);
-            Gdiplus::LinearGradientBrush brd(
-                Gdiplus::PointF(sx, sy), Gdiplus::PointF(sx + sw, sy + sh),
-                Gdiplus::Color(115, 255, 255, 255), Gdiplus::Color(135, 236, 72, 153));
-            Gdiplus::Pen pen(&brd, 1.2f);
+            Gdiplus::Pen pen(Gdiplus::Color(72, 255, 255, 255), 1.0f);
             g.DrawPath(&pen, &bp);
         }
 
-        // Top-right badge on hero card with radar pulse
+        // Top-right badge on showcase card
         {
             bool live = g_cs2Pid != 0;
-            COLORREF bc = live ? C_OK : C_CYAN;
+            COLORREF bc = live ? C_OK : C_SLATE;
             const wchar_t* btxt = live ? L"TARGET LIVE" : L"STANDBY";
             float btw = MeasureTextG(g, btxt, 9.5f, Gdiplus::FontStyleBold);
             float bpw = btw + 26.0f;
             float bpx = sx + sw - 12.0f - bpw;
             float bpy = sy + 12.0f;
+            float pulse = 0.5f + 0.5f * std::sinf(t * 2.1f);
             FillRoundSolid(g, bpx, bpy, bpw, 22.0f, 11.0f,
-                           Gdiplus::Color(175, 12, 12, 30), GCol(130, bc), 1.0f);
-            DrawPulseRing(g, bpx + 11.0f, bpy + 11.0f, 2.8f, t * 0.7f, bc);
-            DrawGlowDot(g, bpx + 11.0f, bpy + 11.0f, 2.8f, bc);
+                           Gdiplus::Color(175, 12, 13, 22), GCol(110, bc), 1.0f);
+            DrawSoftDot(g, bpx + 11.0f, bpy + 11.0f, 2.7f, bc, pulse);
             DrawTextG(g, bpx + 19.0f, bpy + 5.0f, btxt, GCol(255, bc), 9.5f, Gdiplus::FontStyleBold);
         }
 
-        // Bottom caption inside hero card
+        // Clean bottom caption
         {
-            const std::wstring coreTag = L"VALKYRIE // CORE";
+            const std::wstring coreTag = L"HVHGOD // INTERNAL";
             float ctw = MeasureTextG(g, coreTag, 9.5f, Gdiplus::FontStyleBold);
-            float cpw = ctw + 22.0f;
-            FillRoundGlass(g, sx + 16.0f, sy + sh - 84.0f, cpw, 20.0f, 10.0f,
-                           GCol(185, C_PINK), GCol(185, C_VIOLET),
-                           Gdiplus::Color(130, 255, 255, 255), 0.8f, false);
-            DrawTextG(g, sx + 16.0f + (cpw - ctw) * 0.5f, sy + sh - 79.5f,
+            float cpw = ctw + 20.0f;
+            FillRoundGlass(g, sx + 16.0f, sy + sh - 82.0f, cpw, 20.0f, 10.0f,
+                           GCol(195, C_ROSE), GCol(195, C_PLUM),
+                           Gdiplus::Color(100, 255, 255, 255), 0.8f, false);
+            DrawTextG(g, sx + 16.0f + (cpw - ctw) * 0.5f, sy + sh - 77.5f,
                       coreTag, GCol(255, C_TEXT), 9.5f, Gdiplus::FontStyleBold);
         }
-        DrawTextG(g, sx + 16.0f, sy + sh - 57.0f, L"HVHGOD Runtime", GCol(255, C_TEXT), 16.5f, Gdiplus::FontStyleBold);
-        DrawTextG(g, sx + 16.0f, sy + sh - 32.0f, L"Pure local engine \u00b7 No server", GCol(215, C_DIM), 10.5f);
+        DrawTextG(g, sx + 16.0f, sy + sh - 55.0f, L"Local Runtime", GCol(255, C_TEXT), 16.5f, Gdiplus::FontStyleBold);
+        DrawTextG(g, sx + 16.0f, sy + sh - 30.0f, L"Standalone CS2 engine \u00b7 No server", GCol(215, C_DIM), 10.5f);
 
-        // Live animated audio/signal equalizer bars on bottom right
-        for (int i = 0; i < 5; i++) {
-            float ex = sx + sw - 46.0f + static_cast<float>(i) * 6.0f;
-            float wave = 0.5f + 0.5f * std::sinf(t * (3.2f + static_cast<float>(i) * 0.85f) + static_cast<float>(i) * 1.25f);
-            float eh = 6.0f + 17.0f * wave;
-            COLORREF ec = (i % 2 == 0) ? C_PINK2 : C_CYAN;
-            FillRoundSolid(g, ex, sy + sh - 22.0f - eh, 3.5f, eh, 1.7f, GCol(220, ec));
-        }
-
-        // ---- 9. Bottom Right Bouncy Chibi & Specs Card (x=664, y=464, w=274, h=150)
+        // ---- 9. Bottom Right Frosted Chibi & Specs Card (x=664, y=464, w=274, h=150)
         float cy = 464.0f, ch = 150.0f;
-        FillRoundGlass(g, sx, cy, sw, ch, 18.0f,
-                       Gdiplus::Color(166, 20, 18, 46), Gdiplus::Color(174, 26, 20, 56),
-                       Gdiplus::Color(70, 255, 255, 255), 1.0f, true);
+        FillFrostedCard(g, sx, cy, sw, ch, 18.0f,
+                        Gdiplus::Color(34, 16, 17, 28), Gdiplus::Color(62, 255, 255, 255), true);
 
-        // Bouncy chibi sticker frame
-        float csx = sx + 13.0f, csy = cy + 14.0f, csw = 114.0f, csh = 122.0f;
+        // Transparent chibi resting directly on the frosted glass
+        float csx = sx + 14.0f, csy = cy + 18.0f, csw = 112.0f, csh = 112.0f;
         if (g_imgChibi) {
-            float cBob  = std::sinf(t * 2.5f + 0.7f) * 3.4f;
-            float cSway = std::sinf(t * 1.25f) * 1.8f;
-            float cZoom = 1.075f + 0.022f * std::sinf(t * 2.5f);
-            DrawImageClippedRound(g, g_imgChibi, csx, csy, csw, csh, 14.0f,
-                                  0.0f, 0.0f, static_cast<float>(g_imgChibi->GetWidth()),
-                                  static_cast<float>(g_imgChibi->GetHeight()),
-                                  cZoom, cSway, cBob);
-        }
-        // Twinkling anime sparkles on chibi corners
-        {
-            float sp1 = 0.5f + 0.5f * std::sinf(t * 3.1f);
-            float sp2 = 0.5f + 0.5f * std::sinf(t * 2.7f + 2.1f);
-            DrawSparkleStar(g, csx + 14.0f, csy + 15.0f, 4.0f + 2.2f * sp1, static_cast<BYTE>(110 + 135 * sp1), C_CYAN);
-            DrawSparkleStar(g, csx + csw - 14.0f, csy + csh - 16.0f, 3.5f + 2.0f * sp2, static_cast<BYTE>(95 + 145 * sp2), C_PINK2);
-        }
-        {
-            Gdiplus::GraphicsPath cp;
-            MakeRoundPath(cp, csx, csy, csw, csh, 14.0f);
-            float shift = 0.5f + 0.5f * std::sinf(t * 2.0f);
-            Gdiplus::LinearGradientBrush cbrd(
-                Gdiplus::PointF(csx + shift * 20.0f, csy), Gdiplus::PointF(csx + csw, csy + csh),
-                GCol(195, C_PINK2), GCol(195, C_CYAN));
-            Gdiplus::Pen cpen(&cbrd, 1.4f);
-            g.DrawPath(&cpen, &cp);
+            g.DrawImage(g_imgChibi, Gdiplus::RectF(csx, csy, csw, csh),
+                        0.0f, 0.0f, static_cast<float>(g_imgChibi->GetWidth()),
+                        static_cast<float>(g_imgChibi->GetHeight()), Gdiplus::UnitPixel);
         }
 
-        // 3 mini info pills beside chibi
+        // 3 clean info pills beside chibi
         struct Spec { const wchar_t* k; const wchar_t* v; COLORREF c; };
         Spec specs[3] = {
-            { L"MENU KEY", L"INSERT",     C_PINK2  },
-            { L"SECURITY", L"6 STRIPPED", C_CYAN   },
-            { L"RUNTIME",  L"WIN32 x64",  C_VIOLET },
+            { L"MENU KEY", L"INSERT",     C_ROSE2 },
+            { L"SECURITY", L"6 STRIPPED", C_SLATE },
+            { L"RUNTIME",  L"WIN32 x64",  C_OK    },
         };
-        float spX = csx + csw + 12.0f;
-        float spW = sx + sw - 13.0f - spX;
+        float spX = csx + csw + 10.0f;
+        float spW = sx + sw - 14.0f - spX;
         for (int i = 0; i < 3; i++) {
-            float spY = cy + 14.0f + i * 42.0f;
-            FillRoundGlass(g, spX, spY, spW, 37.0f, 10.0f,
-                           Gdiplus::Color(135, 16, 15, 36), Gdiplus::Color(145, 24, 22, 52),
-                           GCol(75, specs[i].c), 1.0f, false);
-            FillRoundSolid(g, spX + 1.5f, spY + 9.0f, 2.5f, 19.0f, 1.2f, GCol(220, specs[i].c));
+            float spY = cy + 15.0f + static_cast<float>(i) * 42.0f;
+            FillRoundSolid(g, spX, spY, spW, 36.0f, 10.0f,
+                           Gdiplus::Color(72, 12, 13, 22), Gdiplus::Color(44, 255, 255, 255), 1.0f);
+            FillRoundSolid(g, spX + 1.5f, spY + 9.0f, 2.5f, 18.0f, 1.2f, GCol(215, specs[i].c));
             DrawTextG(g, spX + 10.0f, spY + 4.5f, specs[i].k, GCol(195, C_DIM), 9.2f, Gdiplus::FontStyleBold);
             DrawTextG(g, spX + 10.0f, spY + 17.5f, specs[i].v, GCol(255, C_TEXT), 11.0f, Gdiplus::FontStyleBold);
         }
@@ -1244,17 +1232,16 @@ static void Paint(HDC hdc, int cw) {
 
     // ---- 10. Footer
     DrawTextG(g, 24.0f, static_cast<float>(CW_H - 25),
-              L"press INSERT in game \u00b7 everything dies quietly", GCol(190, C_DIM), 10.0f);
-    std::wstring fRight = L"HVHGOD ANIME EDITION \u00b7 LOCAL ENGINE";
+              L"press INSERT in game \u00b7 everything dies quietly", GCol(195, C_DIM), 10.0f);
+    std::wstring fRight = L"HVHGOD \u00b7 FROSTED ANIME EDITION";
     float frW = MeasureTextG(g, fRight, 10.0f, Gdiplus::FontStyleBold);
     DrawTextG(g, static_cast<float>(cw) - 24.0f - frW, static_cast<float>(CW_H - 25),
-              fRight, GCol(185, C_VIOLET), 10.0f, Gdiplus::FontStyleBold);
+              fRight, GCol(190, C_DIM), 10.0f, Gdiplus::FontStyleBold);
 
-    // Outer subtle rounded glass window border
     {
         Gdiplus::GraphicsPath wp;
         MakeRoundPath(wp, 0.5f, 0.5f, static_cast<float>(cw - 1), static_cast<float>(CW_H - 1), 19.0f);
-        Gdiplus::Pen wpen(Gdiplus::Color(65, 255, 255, 255), 1.0f);
+        Gdiplus::Pen wpen(Gdiplus::Color(62, 255, 255, 255), 1.0f);
         g.DrawPath(&wpen, &wp);
     }
 }
@@ -1291,12 +1278,17 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         return 0;
     case WM_MOUSEMOVE: {
         int x = GET_X_LPARAM(lp), y = GET_Y_LPARAM(lp);
-        int h = -1;
+        int h = -1, hc = -1;
         RECT rc; GetClientRect(hwnd, &rc);
         if (x >= rc.right - 90 && x < rc.right - 49 && y < TITLE) h = 100;
         else if (x >= rc.right - 49 && y < TITLE) h = 101;
         for (auto& b : g_btns)
             if (x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h) h = b.id;
+        for (int i = 0; i < 3; i++) {
+            int cx = 22 + i * 213;
+            if (x >= cx && x < cx + 200 && y >= 158 && y < 240) hc = i;
+        }
+        g_hoverCard = hc;
         if (h != g_hover) { g_hover = h; InvalidateRect(hwnd, nullptr, FALSE); }
         TRACKMOUSEEVENT tme{ sizeof(tme), TME_LEAVE, hwnd, 0 };
         TrackMouseEvent(&tme);
@@ -1304,6 +1296,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     }
     case WM_MOUSELEAVE:
         g_hover = -1;
+        g_hoverCard = -1;
         InvalidateRect(hwnd, nullptr, FALSE);
         return 0;
     case WM_LBUTTONDOWN: {
@@ -1589,7 +1582,7 @@ int WINAPI wWinMain(HINSTANCE inst, HINSTANCE, PWSTR cmdline, int show) {
     UpdateWindow(g_hwnd);
     SetTimer(g_hwnd, 1, 1000, nullptr);   // state
     SetTimer(g_hwnd, 2, 400, nullptr);    // pipeline log tail
-    SetTimer(g_hwnd, 3, 25, nullptr);     // 40fps anime motion & particles
+    SetTimer(g_hwnd, 3, 16, nullptr);     // 60fps smooth sakura, rain & hover easing
 
     MSG msg;
     while (GetMessageW(&msg, nullptr, 0, 0) > 0) {

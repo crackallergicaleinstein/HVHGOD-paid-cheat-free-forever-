@@ -35,7 +35,7 @@ cl /nologo /std:c++20 /O2 /EHsc /W4 /permissive- /utf-8 /DUNICODE /D_UNICODE ^
    src\launcher.cpp ^
    /Fo:bin\ /Fe:bin\hvhgod-launcher.exe ^
    /link /SUBSYSTEM:WINDOWS /ENTRY:wWinMainCRTStartup ^
-   user32.lib gdi32.lib shell32.lib advapi32.lib ole32.lib
+   user32.lib gdi32.lib gdiplus.lib shell32.lib advapi32.lib ole32.lib
 if errorlevel 1 goto fail
 echo [build] ok
 exit /b 0

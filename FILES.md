@@ -7,7 +7,8 @@ empty — Windows Explorer shows folders at the top level, so open them.
 
 | File | Size | What it is |
 |---|---|---|
-| `launcher\src\launcher.cpp` | 34 KB | the whole Win32 launcher: window, drawing, state, pipeline driver |
+| `launcher\src\launcher.cpp` | 62 KB | Win32 / GDI+ launcher: frosted glass UI, animations, state, pipeline driver |
+| `launcher\src\anime_assets.h` | 1.3 MB | embedded anime artworks & transparent chibi assets |
 | `tools\caller\caller.cpp` | 7 KB | builds the handshake block and invokes the image entry point |
 | `tools\iatfix\iatfix.cpp` | 13 KB | repairs unresolved imports, clears the DOS magic |
 | `loader\XMap.cs` | 37 KB | manual PE mapper (relocations, imports, `.pdata`, TLS) |
