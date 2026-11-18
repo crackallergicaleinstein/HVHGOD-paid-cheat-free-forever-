@@ -228,6 +228,15 @@ If rage does nothing, check `Ragebot\rage.log` or verify step 5d (`tools\rage_se
 
 Offsets live in `data\offsets.genuine.bridge` and are staged to `%LOCALAPPDATA%\HVHGOD\CS2 Runtime\Internal\Bridge\Offsets\offsets.bridge`. After a CS2 update, replace the manifest — the six patches are build-independent.
 
+> [!WARNING]
+> **The committed manifest is stale.** `offsets.genuine.bridge` describes
+> `client.dll` sha256 `99a6720b…` (built 2026-11-11). The current game ships
+> `39de4a6d…` (build 14198, 2026-11-18), so every RVA in it is wrong — see
+> [`docs/OFFSETS.md`](docs/OFFSETS.md). `data\offsets.current.bridge` carries
+> live-resolved addresses for the current build and is what the standalone SDK
+> consumes. Regenerate it with `pwsh -File sdk\tools\make-manifest.ps1` after
+> each game update.
+
 ### The six patches (35 bytes out of 60,192,400)
 
 ```text
