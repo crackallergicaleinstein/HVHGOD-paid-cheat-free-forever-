@@ -231,7 +231,7 @@ Offsets live in `data\offsets.genuine.bridge` and are staged to `%LOCALAPPDATA%\
 > [!WARNING]
 > **The committed manifest is stale.** `offsets.genuine.bridge` describes
 > `client.dll` sha256 `99a6720b…` (built 2026-11-11). The current game ships
-> `39de4a6d…` (build 14198, 2026-11-18), so every RVA in it is wrong — see
+> `07103341…` (build 14200, 2026-11-20), so every RVA in it is wrong — see
 > [`docs/OFFSETS.md`](docs/OFFSETS.md). `data\offsets.current.bridge` carries
 > live-resolved addresses for the current build and is what the standalone SDK
 > consumes. Regenerate it with `pwsh -File sdk\tools\make-manifest.ps1` after

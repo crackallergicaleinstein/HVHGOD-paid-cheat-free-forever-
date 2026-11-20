@@ -1,31 +1,31 @@
-v1	1	39de4a6d1881ebf9726a43ffcb1e05ce12d007750053afc52eed5a97b7d21c7d	2026-11-18T19:16:04Z	-	major	1	30	28	2	
+v1	1	07103341bc9e0ae2c596b2929075c5094cb397d7e370ea00986c720ed72414e1	2026-11-20T14:33:14Z	-	major	1	30	28	2	
 SDK-OFFSETS-CURRENT-V1
-module	client.dll	43569152
+module	client.dll	43573248
 module	engine2.dll	10526720
 module	inputsystem.dll	339968
 module	matchmaking.dll	2064384
 module	soundsystem.dll	7053312
-build	client.dll	39de4a6d1881ebf9726a43ffcb1e05ce12d007750053afc52eed5a97b7d21c7d
-build	engine2.dll	604e3d5420023826991c7c0ac575229b39e505912f7ae0d5ea5b82900970f79e
+build	client.dll	07103341bc9e0ae2c596b2929075c5094cb397d7e370ea00986c720ed72414e1
+build	engine2.dll	edb6ab58c84727ce6f1ec0edbffd8155c16bebeb4ec641449a7eab5d83dfea0e
 build	inputsystem.dll	bcfc9c7289579aab70a33bc12f3e20545d5880e52f98dc65d80e25d89df653f5
 build	matchmaking.dll	668db7c4bc2b63a2a6dd0b6766ab5953892ae16bd07a42fd837ae3f9a7f44536
 build	soundsystem.dll	645260089eb32075efdd18e4217e7f71a1df5f79396c89a06431cb5b247a1851
-offset	client.dll	dwCSGOInput	39243744	resolved	dumper%20live-resolved
-offset	client.dll	dwEntityList	40945280	resolved	dumper%20live-resolved
-offset	client.dll	dwGameEntitySystem	40945280	resolved	dumper%20live-resolved
+offset	client.dll	dwCSGOInput	39245152	resolved	dumper%20live-resolved
+offset	client.dll	dwEntityList	40949168	resolved	dumper%20live-resolved
+offset	client.dll	dwGameEntitySystem	40949168	resolved	dumper%20live-resolved
 offset	client.dll	dwGameEntitySystem_highestEntityIndex	8480	resolved	dumper%20live-resolved
-offset	client.dll	dwGameRules	39153272	resolved	dumper%20live-resolved
+offset	client.dll	dwGameRules	39154680	resolved	dumper%20live-resolved
 offset	client.dll	dwGlobalVars	35797712	resolved	dumper%20live-resolved
-offset	client.dll	dwGlowManager	39140240	resolved	dumper%20live-resolved
-offset	client.dll	dwLocalPlayerController	38989176	resolved	dumper%20live-resolved
-offset	client.dll	dwLocalPlayerPawn	39155000	resolved	dumper%20live-resolved
-offset	client.dll	dwPrediction	39154752	resolved	dumper%20live-resolved
-offset	client.dll	dwViewAngles	39245416	resolved	dumper%20live-resolved
-offset	client.dll	dwViewMatrix	39177808	resolved	dumper%20live-resolved
-offset	client.dll	dwViewRender	39180312	resolved	dumper%20live-resolved
-offset	client.dll	dwWeaponC4	38516352	resolved	dumper%20live-resolved
-offset	client.dll	dwPlantedC4	0	unresolved	pattern%20outdated%20in%20cs2-dumper%20run
+offset	client.dll	dwGlowManager	39141648	resolved	dumper%20live-resolved
+offset	client.dll	dwLocalPlayerController	38990592	resolved	dumper%20live-resolved
+offset	client.dll	dwLocalPlayerPawn	39156408	resolved	dumper%20live-resolved
+offset	client.dll	dwPrediction	39156160	resolved	dumper%20live-resolved
+offset	client.dll	dwViewAngles	39246824	resolved	dumper%20live-resolved
+offset	client.dll	dwViewMatrix	39179216	resolved	dumper%20live-resolved
+offset	client.dll	dwViewRender	39181720	resolved	dumper%20live-resolved
+offset	client.dll	dwWeaponC4	38517760	resolved	dumper%20live-resolved
 offset	client.dll	dwSensitivity	0	unresolved	pattern%20outdated%20in%20cs2-dumper%20run
+offset	client.dll	dwPlantedC4	0	unresolved	pattern%20outdated%20in%20cs2-dumper%20run
 offset	engine2.dll	dwBuildNumber	7023900	resolved	dumper%20live-resolved
 offset	engine2.dll	dwNetworkGameClient	10156944	resolved	dumper%20live-resolved
 offset	engine2.dll	dwNetworkGameClient_clientTickCount	920	resolved	dumper%20live-resolved
